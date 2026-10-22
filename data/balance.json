@@ -1,0 +1,21 @@
+{
+  "level_cap": 50,
+  "xp_base": 40,
+  "xp_growth": 1.18,
+  "hp_per_level_pct": 0.12,
+  "attack_per_level_pct": 0.1,
+  "enemy_hp_per_wave_pct": 0.14,
+  "enemy_attack_per_wave_pct": 0.1,
+  "credits_scaling_per_wave_pct": 0.03,
+  "respawn_delay_sec": 1.6,
+  "operator_revive_sec": 8.0,
+  "execution_threshold_pct": 0.3,
+  "execution_bonus_mult": 1.5,
+  "rapid_burst_cooldown_sec": 8.0,
+  "rapid_burst_shots": 3,
+  "rapid_burst_shot_interval_sec": 0.18,
+  "overdrive_duration_sec": 6.0,
+  "ultimate_charge_per_attack": 0.05,
+  "elite_wave_interval": 5,
+  "projectile_speed": 260.0
+}
