@@ -10,4 +10,9 @@
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Remove="tools/**" />
+    <Compile Remove=".godot/**" />
+  </ItemGroup>
+
 </Project>

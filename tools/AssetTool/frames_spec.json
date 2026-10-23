@@ -1,0 +1,67 @@
+{
+  "sets": [
+    {
+      "prefix": "operators",
+      "cols": {
+        "striker": [60, 172],
+        "volt": [174, 292],
+        "hawk": [296, 399],
+        "vex": [416, 522],
+        "torque": [533, 637]
+      },
+      "rows": {
+        "idle": [296, 331],
+        "move": [332, 364],
+        "attack": [365, 397],
+        "hurt": [398, 429],
+        "defeat": [430, 463]
+      },
+      "frames": 4
+    },
+    {
+      "prefix": "enemies/watcher",
+      "cols": { "default": [665, 748] },
+      "rows": {
+        "idle": [296, 331],
+        "move": [332, 364],
+        "attack": [365, 397],
+        "hurt": [398, 429],
+        "defeat": [430, 463]
+      },
+      "frames": 2
+    },
+    {
+      "prefix": "enemies/hunter",
+      "cols": { "default": [745, 845] },
+      "rows": {
+        "idle": [296, 331],
+        "move": [332, 364],
+        "attack": [365, 397],
+        "hurt": [398, 429],
+        "defeat": [430, 463]
+      },
+      "frames": 3
+    },
+    {
+      "prefix": "enemies/enforcer",
+      "cols": { "default": [865, 965] },
+      "rows": {
+        "idle": [296, 331],
+        "move": [332, 364],
+        "attack": [365, 397],
+        "hurt": [398, 429],
+        "defeat": [430, 463]
+      },
+      "frames": 3
+    },
+    {
+      "prefix": "enemies/warden",
+      "cols": { "default": [977, 1112] },
+      "rows": {
+        "idle": [293, 374],
+        "attack": [374, 466]
+      },
+      "frames": 1
+    }
+  ]
+}

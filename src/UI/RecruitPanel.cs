@@ -109,7 +109,7 @@ public partial class RecruitPanel : Control
 
     Control BuildRow(OperatorDef def)
     {
-        var panel = new PanelContainer { CustomMinimumSize = new Vector2(424f, 32f) };
+        var panel = new PanelContainer { CustomMinimumSize = new Vector2(424f, 34f) };
         var sb = new StyleBoxFlat
         {
             BgColor = new Color(0.07f, 0.09f, 0.12f, 0.9f),
@@ -124,6 +124,18 @@ public partial class RecruitPanel : Control
         hbox.AddThemeConstantOverride("separation", 6);
         hbox.MouseFilter = MouseFilterEnum.Ignore;
         panel.AddChild(hbox);
+
+        var sprite = new TextureRect
+        {
+            CustomMinimumSize = new Vector2(30f, 30f),
+            SizeFlagsVertical = SizeFlags.ShrinkCenter,
+            TextureFilter = CanvasItem.TextureFilterEnum.Nearest,
+            MouseFilter = MouseFilterEnum.Ignore,
+        };
+        var idle = Util.Assets.Load($"operators/{def.Id}/idle_0");
+        if (idle != null)
+            sprite.Texture = idle;
+        hbox.AddChild(sprite);
 
         var chip = new PanelContainer { CustomMinimumSize = new Vector2(8f, 24f) };
         var chipSb = new StyleBoxFlat { BgColor = def.Accent };
@@ -145,16 +157,16 @@ public partial class RecruitPanel : Control
         };
         infoLabel.AddThemeFontSizeOverride("font_size", 7);
         infoLabel.AddThemeColorOverride("font_color", new Color("#8c9bb0"));
-        infoLabel.CustomMinimumSize = new Vector2(150f, 0f);
+        infoLabel.CustomMinimumSize = new Vector2(120f, 0f);
         hbox.AddChild(infoLabel);
 
         var stateLabel = new Label { MouseFilter = MouseFilterEnum.Ignore };
         stateLabel.AddThemeFontSizeOverride("font_size", 7);
         stateLabel.AddThemeColorOverride("font_color", new Color("#ffd75e"));
-        stateLabel.CustomMinimumSize = new Vector2(58f, 0f);
+        stateLabel.CustomMinimumSize = new Vector2(52f, 0f);
         hbox.AddChild(stateLabel);
 
-        var actionBtn = MakeButton("", def.Accent, 100f);
+        var actionBtn = MakeButton("", def.Accent, 96f);
         actionBtn.Pressed += () => OnActionButton(def.Id);
         hbox.AddChild(actionBtn);
 

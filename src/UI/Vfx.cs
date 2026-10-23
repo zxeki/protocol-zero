@@ -50,3 +50,27 @@ public partial class MarkIndicator : Node2D
         DrawPolyline(pts, Colors.Black, 1f);
     }
 }
+
+public partial class BurstFx : Node2D
+{
+    Texture2D _texture = null!;
+
+    public static BurstFx Spawn(Node parent, Vector2 pos, Texture2D texture)
+    {
+        var fx = new BurstFx { _texture = texture };
+        fx.GlobalPosition = pos;
+        parent.AddChild(fx);
+
+        var tw = fx.CreateTween();
+        tw.TweenProperty(fx, "scale", new Vector2(1.35f, 1.35f), 0.35f).SetEase(Tween.EaseType.Out);
+        tw.Parallel().TweenProperty(fx, "modulate:a", 0f, 0.3f).SetDelay(0.15f);
+        tw.TweenCallback(Callable.From(fx.QueueFree));
+        return fx;
+    }
+
+    public override void _Draw()
+    {
+        var s = _texture.GetSize();
+        DrawTextureRect(_texture, new Rect2(-s.X / 2f, -s.Y / 2f, s.X, s.Y), false);
+    }
+}

@@ -18,6 +18,7 @@ public partial class Main : Node2D
 
         _combat = new CombatManager();
         AddChild(_combat);
+        battlefield.Combat = _combat;
         _combat.SpawnSquad();
 
         var hudLayer = new CanvasLayer();
