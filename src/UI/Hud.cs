@@ -288,9 +288,17 @@ public partial class Hud : Control
 
     void OnWaveChanged(int wave)
     {
+        var cfg = Balance.Instance.Config;
         int sector = (wave - 1) / 5 + 1;
         int node = (wave - 1) % 5 + 1;
-        _sectorLabel.Text = $"SECTOR {sector}-{node}";
+        bool boss = cfg.BossWaveInterval > 0 && wave % cfg.BossWaveInterval == 0;
+        bool elite = !boss && cfg.EliteWaveInterval > 0 && wave % cfg.EliteWaveInterval == 0;
+
+        _sectorLabel.Text = boss ? $"SECTOR {sector}-{node}  WARDEN"
+            : elite ? $"SECTOR {sector}-{node}  ELITE"
+            : $"SECTOR {sector}-{node}";
+        _sectorLabel.AddThemeColorOverride("font_color",
+            boss ? new Color("#e04848") : elite ? new Color("#f0a030") : new Color("#9fb2c8"));
     }
 
     void OnRewards(long credits, float xp)

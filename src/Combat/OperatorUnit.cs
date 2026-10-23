@@ -470,8 +470,8 @@ public partial class OperatorUnit : Combatant
             return;
 
         var cfg = Balance.Instance.Config;
-        var torque = _manager.GetTorque();
-        if (torque != null && torque.IsAlive)
+        var fortifier = _manager.GetPassiveCarrier("fortified_plating");
+        if (fortifier != null)
             amount *= cfg.FortifyTakenMult;
         if (_barrierTimer > 0f)
             amount *= cfg.BarrierTakenMult;

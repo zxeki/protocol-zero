@@ -79,9 +79,16 @@ public partial class CombatManager : Node2D
         WaveChanged?.Invoke(Wave);
 
         var cfg = Balance.Instance.Config;
-        bool eliteWave = Wave % cfg.EliteWaveInterval == 0;
+        bool bossWave = cfg.BossWaveInterval > 0 && Wave % cfg.BossWaveInterval == 0;
+        bool eliteWave = !bossWave && Wave % cfg.EliteWaveInterval == 0;
 
-        if (eliteWave)
+        if (bossWave)
+        {
+            SpawnEnemy("the_warden", 0, true);
+            for (int i = 0; i < cfg.BossEscortCount; i++)
+                SpawnEnemy("hunter_drone", i + 1, false);
+        }
+        else if (eliteWave)
         {
             SpawnEnemy("enforcer", 0, true);
             for (int i = 0; i < cfg.EliteEscortCount; i++)
@@ -91,8 +98,16 @@ public partial class CombatManager : Node2D
         {
             int growth = Mathf.Max(1, cfg.EnemiesPerWaveGrowthDivisor);
             int count = Mathf.Clamp(cfg.EnemiesPerWaveBase + (Wave - 1) / growth, 1, cfg.EnemiesPerWaveMax);
+
+            int hunters = 0;
+            if (cfg.HunterDroneFromWave > 0 && Wave >= cfg.HunterDroneFromWave && count > 1)
+            {
+                hunters = 1 + (Wave - cfg.HunterDroneFromWave) / Mathf.Max(1, cfg.HunterDroneRampWaves);
+                hunters = Mathf.Clamp(hunters, 0, count - 1);
+            }
+
             for (int i = 0; i < count; i++)
-                SpawnEnemy("watcher", i, false);
+                SpawnEnemy(i >= count - hunters ? "hunter_drone" : "watcher", i, false);
         }
     }
 
@@ -125,9 +140,14 @@ public partial class CombatManager : Node2D
         foreach (var op in Operators)
             GameState.Instance.AddXp(op.Def.Id, xp);
 
-        RewardsAwarded?.Invoke(credits, xp);
+        long milestoneBonus = 0;
+        if (e.Def.Id == "the_warden" && cfg.BossWaveInterval > 0)
+            milestoneBonus = GameState.Instance.ClaimBossMilestone(Mathf.Max(1, Wave / cfg.BossWaveInterval));
+
+        RewardsAwarded?.Invoke(credits + milestoneBonus, xp);
         EnemyKilled?.Invoke(e);
-        GD.Print($"[Combat] Wave {Wave}: {e.Def.DisplayName} defeated  +{credits} CR  +{xp:0} XP");
+        GD.Print($"[Combat] Wave {Wave}: {e.Def.DisplayName} defeated  +{credits} CR  +{xp:0} XP"
+            + (milestoneBonus > 0 ? $"  +{milestoneBonus} CR milestone" : ""));
 
         if (Enemies.Count == 0 && !_waveEnding)
         {
@@ -167,14 +187,20 @@ public partial class CombatManager : Node2D
         return best;
     }
 
-    public OperatorUnit? GetTorque() =>
-        Operators.FirstOrDefault(o => o.Def.Id == "torque" && o.IsAlive);
+    public OperatorUnit? GetPassiveCarrier(string passiveId) =>
+        Operators.FirstOrDefault(o => o.IsAlive && o.Def.PassiveId == passiveId);
+
+    public OperatorUnit? GetFortressTaunter() =>
+        Operators.FirstOrDefault(o => o.IsAlive && o.FortressTauntRemaining > 0f);
 
     public OperatorUnit? GetTargetForEnemy(EnemyUnit enemy)
     {
         var alive = Operators.Where(o => o.IsAlive).ToList();
         if (alive.Count == 0)
             return null;
+
+        if (enemy.Def.Id == "hunter_drone")
+            return alive.OrderBy(o => o.HpFraction).First();
 
         if (GD.Randf() < 0.5f)
             return alive.OrderBy(o => o.HpFraction).First();

@@ -161,6 +161,70 @@ public static class PixelArt
         return c.ToTexture();
     }
 
+    public static ImageTexture BuildHunterDrone()
+    {
+        var c = new PixelCanvas(16, 14);
+
+        c.Rect(4, 0, 8, 1, GunMetal);
+        c.Set(4, 0, StrikerRed);
+        c.Set(11, 0, StrikerRed);
+
+        c.Rect(7, 1, 2, 3, GunMetal);
+
+        c.Rect(3, 4, 10, 7, Outline);
+        c.Rect(4, 5, 8, 5, ArmorDark);
+        c.Rect(5, 6, 5, 3, ArmorMid);
+        c.Rect(4, 7, 3, 2, new Color("#ff5a3c"));
+        c.Rect(4, 7, 1, 2, new Color("#ffd9c8"));
+
+        c.Rect(11, 6, 5, 2, Outline);
+        c.Rect(12, 7, 4, 1, GunMetal);
+
+        c.Rect(4, 11, 3, 2, ArmorDark);
+        c.Rect(9, 11, 3, 2, ArmorDark);
+
+        return c.ToTexture();
+    }
+
+    public static ImageTexture BuildWarden()
+    {
+        var c = new PixelCanvas(36, 52);
+
+        c.Rect(11, 0, 14, 9, Outline);
+        c.Rect(12, 1, 12, 7, ArmorDark);
+        c.Rect(14, 3, 8, 3, new Color("#ff5a3c"));
+        c.Rect(13, 5, 10, 1, StrikerRed);
+
+        c.Rect(6, 9, 24, 20, Outline);
+        c.Rect(7, 10, 22, 18, ArmorDark);
+        c.Rect(11, 13, 14, 11, ArmorMid);
+        c.Rect(15, 16, 6, 5, new Color("#ff5a3c"));
+        c.Rect(16, 17, 4, 3, new Color("#ffd9c8"));
+
+        c.Rect(0, 10, 7, 12, Outline);
+        c.Rect(1, 11, 5, 10, ArmorMid);
+        c.Rect(29, 10, 7, 12, Outline);
+        c.Rect(30, 11, 5, 10, ArmorMid);
+
+        c.Rect(0, 20, 8, 5, Outline);
+        c.Rect(1, 21, 6, 3, GunMetal);
+        c.Rect(0, 22, 2, 2, new Color("#ff5a3c"));
+
+        c.Rect(28, 20, 8, 5, Outline);
+        c.Rect(29, 21, 6, 3, GunMetal);
+        c.Rect(34, 22, 2, 2, new Color("#ff5a3c"));
+
+        c.Rect(8, 29, 8, 19, Outline);
+        c.Rect(9, 30, 6, 16, ArmorDark);
+        c.Rect(20, 29, 8, 19, Outline);
+        c.Rect(21, 30, 6, 16, ArmorDark);
+
+        c.Rect(6, 48, 11, 4, Outline);
+        c.Rect(19, 48, 11, 4, Outline);
+
+        return c.ToTexture();
+    }
+
     public static ImageTexture BuildVolt()
     {
         var c = new PixelCanvas(22, 28);

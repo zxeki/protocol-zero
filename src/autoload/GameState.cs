@@ -18,6 +18,7 @@ public partial class GameState : Node
     }
 
     public long Credits { get; private set; }
+    public int BossesDefeated { get; private set; }
     public Dictionary<string, OperatorProgress> Progress { get; } = new();
     public List<string> Owned { get; } = new();
     public List<string> Squad { get; } = new();
@@ -90,6 +91,19 @@ public partial class GameState : Node
     public bool Owns(string operatorId) => Owned.Contains(operatorId);
 
     public bool InSquad(string operatorId) => Squad.Contains(operatorId);
+
+    public long ClaimBossMilestone(int bossIndex)
+    {
+        if (bossIndex <= BossesDefeated)
+            return 0;
+
+        BossesDefeated = bossIndex;
+        long bonus = Balance.Instance.Config.BossMilestoneBonusCredits;
+        AddCredits(bonus);
+        Save();
+        GD.Print($"[GameState] Boss milestone #{bossIndex} claimed: +{bonus} CR");
+        return bonus;
+    }
 
     public bool TryRecruit(string operatorId)
     {
@@ -183,6 +197,7 @@ public partial class GameState : Node
         var data = new SaveData
         {
             Credits = Credits,
+            BossesDefeated = BossesDefeated,
             Owned = new List<string>(Owned),
             Squad = new List<string>(Squad),
             Operators = Progress.ToDictionary(
@@ -232,6 +247,7 @@ public partial class GameState : Node
         var validIds = Balance.Instance.Operators.Select(o => o.Id).ToHashSet();
 
         Credits = Math.Max(0, data.Credits);
+        BossesDefeated = Math.Max(0, data.BossesDefeated);
 
         Owned.Clear();
         foreach (var id in data.Owned.Distinct())

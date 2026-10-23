@@ -73,6 +73,13 @@ public sealed class BalanceConfig
     public int EliteWaveInterval { get; set; } = 5;
     public float ProjectileSpeed { get; set; } = 260.0f;
 
+    public int BossWaveInterval { get; set; } = 10;
+    public int BossEscortCount { get; set; } = 2;
+    public long BossMilestoneBonusCredits { get; set; } = 750;
+    public int HunterDroneFromWave { get; set; } = 4;
+    public int HunterDroneRampWaves { get; set; } = 6;
+    public float TargetAnalysisBonusMult { get; set; } = 1.15f;
+
     public int SquadSize { get; set; } = 3;
     public List<string> DefaultSquad { get; set; } = new() { "torque", "striker", "vex" };
     public long StartingCredits { get; set; }
@@ -123,6 +130,7 @@ public sealed class SaveData
     public List<string> Owned { get; set; } = new();
     public List<string> Squad { get; set; } = new();
     public Dictionary<string, SavedOperator> Operators { get; set; } = new();
+    public int BossesDefeated { get; set; }
 }
 
 public sealed class SavedOperator
