@@ -4,11 +4,11 @@ namespace ProtocolZero.UI;
 
 public static class DamageNumber
 {
-    public static void Spawn(Node parent, Vector2 pos, float amount, Color color, bool big = false)
+    public static void Spawn(Node parent, Vector2 pos, float amount, Color color, bool big = false, bool heal = false)
     {
         var label = new Label
         {
-            Text = Mathf.RoundToInt(amount).ToString(),
+            Text = (heal ? "+" : "") + Mathf.RoundToInt(amount).ToString(),
             HorizontalAlignment = HorizontalAlignment.Center,
             Position = pos + new Vector2(-20f, 0f),
             Size = new Vector2(40f, 12f),

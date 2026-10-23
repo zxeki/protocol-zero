@@ -18,6 +18,7 @@ public partial class CombatManager : Node2D
 
     Node _unitLayer = null!;
     FocusMarker? _focusMarker;
+    bool _waveEnding;
 
     public override void _Ready()
     {
@@ -27,30 +28,66 @@ public partial class CombatManager : Node2D
 
     public void SpawnSquad()
     {
-        var def = Balance.Instance.GetOperator("striker");
-        int level = GameState.Instance.Progress[def.Id].Level;
-        var op = new OperatorUnit();
-        op.Init(def, this, level);
-        op.Position = new Vector2(120f, Battlefield.GroundY);
-        _unitLayer.AddChild(op);
-        Operators.Add(op);
+        var cfg = Balance.Instance.Config;
+        float[] slotX = { 304f, 264f, 224f };
+        int slot = 0;
+
+        foreach (var id in cfg.DefaultSquad)
+        {
+            if (slot >= cfg.SquadSize || slot >= slotX.Length)
+                break;
+
+            var def = Balance.Instance.Operators.FirstOrDefault(o => o.Id == id);
+            if (def == null)
+            {
+                GD.Print($"[Combat] Unknown squad member '{id}', skipping");
+                continue;
+            }
+
+            int level = GameState.Instance.Progress[def.Id].Level;
+            var op = new OperatorUnit();
+            op.Init(def, this, level);
+            op.Position = new Vector2(slotX[slot], Battlefield.GroundY);
+            _unitLayer.AddChild(op);
+            Operators.Add(op);
+            slot++;
+        }
+
+        GD.Print($"[Combat] Squad deployed ({Operators.Count}/{cfg.SquadSize}): {string.Join(", ", Operators.Select(o => o.Def.Id))}");
     }
 
     public void StartCombat() => SpawnNextWave();
 
     void SpawnNextWave()
     {
+        _waveEnding = false;
         Wave++;
         WaveChanged?.Invoke(Wave);
 
         var cfg = Balance.Instance.Config;
-        bool elite = Wave % cfg.EliteWaveInterval == 0;
-        string enemyId = elite ? "enforcer" : "watcher";
-        var def = Balance.Instance.Enemies[enemyId];
+        bool eliteWave = Wave % cfg.EliteWaveInterval == 0;
 
+        if (eliteWave)
+        {
+            SpawnEnemy("enforcer", 0, true);
+            for (int i = 0; i < cfg.EliteEscortCount; i++)
+                SpawnEnemy("watcher", i + 1, false);
+        }
+        else
+        {
+            int growth = Mathf.Max(1, cfg.EnemiesPerWaveGrowthDivisor);
+            int count = Mathf.Clamp(cfg.EnemiesPerWaveBase + (Wave - 1) / growth, 1, cfg.EnemiesPerWaveMax);
+            for (int i = 0; i < count; i++)
+                SpawnEnemy("watcher", i, false);
+        }
+    }
+
+    void SpawnEnemy(string id, int slot, bool elite)
+    {
+        var def = Balance.Instance.Enemies[id];
         var enemy = new EnemyUnit();
         enemy.Init(def, this, Wave, elite);
-        enemy.Position = new Vector2(440f, Battlefield.GroundY);
+        enemy.Position = new Vector2(436f + slot * 26f, Battlefield.GroundY);
         enemy.Died += OnEnemyDied;
         _unitLayer.AddChild(enemy);
         Enemies.Add(enemy);
@@ -62,7 +99,8 @@ public partial class CombatManager : Node2D
             return;
 
         Enemies.Remove(e);
-        SetFocus(null);
+        if (FocusTarget == e)
+            SetFocus(null);
 
         var cfg = Balance.Instance.Config;
         float scale = 1f + cfg.CreditsScalingPerWavePct * (Wave - 1);
@@ -77,7 +115,11 @@ public partial class CombatManager : Node2D
         EnemyKilled?.Invoke(e);
         GD.Print($"[Combat] Wave {Wave}: {e.Def.DisplayName} defeated  +{credits} CR  +{xp:0} XP");
 
-        GetTree().CreateTimer(cfg.RespawnDelaySec).Timeout += SpawnNextWave;
+        if (Enemies.Count == 0 && !_waveEnding)
+        {
+            _waveEnding = true;
+            GetTree().CreateTimer(cfg.RespawnDelaySec).Timeout += SpawnNextWave;
+        }
     }
 
     public void OnOperatorDowned(OperatorUnit op)
@@ -111,21 +153,20 @@ public partial class CombatManager : Node2D
         return best;
     }
 
+    public OperatorUnit? GetTorque() =>
+        Operators.FirstOrDefault(o => o.Def.Id == "torque" && o.IsAlive);
+
     public OperatorUnit? GetTargetForEnemy(EnemyUnit enemy)
     {
-        OperatorUnit? best = null;
-        float bestHp = float.MaxValue;
-        foreach (var op in Operators)
-        {
-            if (!op.IsAlive)
-                continue;
-            if (op.HpFraction < bestHp)
-            {
-                bestHp = op.HpFraction;
-                best = op;
-            }
-        }
-        return best;
+        var alive = Operators.Where(o => o.IsAlive).ToList();
+        if (alive.Count == 0)
+            return null;
+
+        if (GD.Randf() < 0.5f)
+            return alive.OrderBy(o => o.HpFraction).First();
+
+        int idx = Mathf.Clamp((int)(GD.Randf() * alive.Count), 0, alive.Count - 1);
+        return alive[idx];
     }
 
     public void HandleWorldClick(Vector2 worldPos)

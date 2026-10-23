@@ -74,6 +74,16 @@ public static class PixelArt
     static readonly Color Visor = new("#ff8866");
     static readonly Color GunMetal = new("#4c5563");
 
+    static readonly Color VoltBlue = new("#4a9eff");
+    static readonly Color VoltHair = new("#e8ecf5");
+    static readonly Color VoltGlow = new("#9fc8ff");
+    static readonly Color HawkTeal = new("#3ecfb2");
+    static readonly Color HawkHood = new("#26796a");
+    static readonly Color VexPink = new("#ff9ad5");
+    static readonly Color VexMagenta = new("#e05ac8");
+    static readonly Color TorqueAmber = new("#f0a030");
+    static readonly Color TorqueDark = new("#8a5a20");
+
     public static ImageTexture BuildStriker()
     {
         var c = new PixelCanvas(22, 28);
@@ -147,6 +157,142 @@ public static class PixelArt
         c.Rect(5, 19, 4, 11, ArmorDark);
         c.Rect(12, 18, 6, 14, Outline);
         c.Rect(13, 19, 4, 11, ArmorDark);
+
+        return c.ToTexture();
+    }
+
+    public static ImageTexture BuildVolt()
+    {
+        var c = new PixelCanvas(22, 28);
+
+        c.Rect(5, 0, 8, 8, Outline);
+        c.Rect(6, 1, 6, 3, VoltHair);
+        c.Rect(6, 4, 6, 3, ArmorMid);
+        c.Rect(9, 4, 3, 2, VoltBlue);
+
+        c.Rect(4, 8, 11, 9, Outline);
+        c.Rect(5, 9, 9, 7, ArmorDark);
+        c.Rect(6, 10, 7, 4, ArmorMid);
+        c.Rect(8, 11, 3, 2, VoltBlue);
+
+        c.Rect(2, 9, 3, 4, Outline);
+        c.Rect(3, 10, 2, 2, ArmorMid);
+
+        c.Rect(13, 10, 4, 3, Outline);
+        c.FillCircle(18.5f, 11.5f, 2.6f, VoltBlue);
+        c.FillCircle(18.5f, 11.5f, 1.4f, VoltGlow);
+        c.Set(19, 11, Colors.White);
+
+        c.Rect(5, 17, 4, 11, Outline);
+        c.Rect(6, 18, 2, 8, ArmorDark);
+        c.Rect(10, 17, 4, 11, Outline);
+        c.Rect(11, 18, 2, 8, ArmorDark);
+
+        c.Rect(4, 25, 5, 3, Outline);
+        c.Rect(9, 25, 5, 3, Outline);
+
+        return c.ToTexture();
+    }
+
+    public static ImageTexture BuildHawk()
+    {
+        var c = new PixelCanvas(22, 28);
+
+        c.Rect(5, 0, 8, 8, Outline);
+        c.Rect(6, 1, 6, 6, HawkHood);
+        c.Rect(6, 4, 6, 3, ArmorDark);
+        c.Rect(9, 4, 3, 2, HawkTeal);
+
+        c.Rect(4, 8, 11, 9, Outline);
+        c.Rect(5, 9, 9, 7, ArmorDark);
+        c.Rect(6, 10, 7, 4, ArmorMid);
+        c.Rect(8, 11, 3, 2, HawkTeal);
+
+        c.Rect(2, 9, 3, 4, Outline);
+        c.Rect(3, 10, 2, 2, ArmorMid);
+
+        c.Rect(12, 11, 8, 4, Outline);
+        c.Rect(13, 12, 7, 2, GunMetal);
+        c.Rect(19, 11, 2, 4, Outline);
+        c.Rect(20, 12, 2, 1, HawkTeal);
+        c.Rect(14, 11, 2, 1, HawkTeal);
+
+        c.Rect(5, 17, 4, 11, Outline);
+        c.Rect(6, 18, 2, 8, ArmorDark);
+        c.Rect(10, 17, 4, 11, Outline);
+        c.Rect(11, 18, 2, 8, ArmorDark);
+
+        c.Rect(4, 25, 5, 3, Outline);
+        c.Rect(9, 25, 5, 3, Outline);
+
+        return c.ToTexture();
+    }
+
+    public static ImageTexture BuildVex()
+    {
+        var c = new PixelCanvas(22, 28);
+
+        c.Rect(5, 0, 8, 8, Outline);
+        c.Rect(6, 1, 6, 3, VexPink);
+        c.Rect(6, 4, 6, 3, ArmorMid);
+        c.Rect(9, 4, 3, 2, VexMagenta);
+
+        c.Rect(4, 8, 11, 9, Outline);
+        c.Rect(5, 9, 9, 7, ArmorDark);
+        c.Rect(6, 10, 7, 4, ArmorMid);
+        c.Rect(7, 12, 6, 1, VexMagenta);
+        c.Rect(9, 11, 2, 3, Colors.White);
+        c.Rect(8, 12, 4, 1, Colors.White);
+
+        c.Rect(2, 9, 3, 4, Outline);
+        c.Rect(3, 10, 2, 2, ArmorMid);
+
+        c.Rect(13, 11, 4, 3, Outline);
+        c.Rect(16, 12, 4, 2, GunMetal);
+        c.Rect(19, 12, 1, 2, VexMagenta);
+
+        c.Rect(5, 17, 4, 11, Outline);
+        c.Rect(6, 18, 2, 8, ArmorDark);
+        c.Rect(10, 17, 4, 11, Outline);
+        c.Rect(11, 18, 2, 8, ArmorDark);
+
+        c.Rect(4, 25, 5, 3, Outline);
+        c.Rect(9, 25, 5, 3, Outline);
+
+        return c.ToTexture();
+    }
+
+    public static ImageTexture BuildTorque()
+    {
+        var c = new PixelCanvas(26, 30);
+
+        c.Rect(7, 0, 9, 8, Outline);
+        c.Rect(8, 1, 7, 6, ArmorMid);
+        c.Rect(8, 1, 7, 2, TorqueAmber);
+        c.Rect(11, 4, 3, 2, new Color("#ffd08a"));
+
+        c.Rect(3, 8, 16, 12, Outline);
+        c.Rect(4, 9, 14, 10, ArmorDark);
+        c.Rect(7, 10, 8, 7, ArmorMid);
+        c.Rect(9, 12, 5, 3, TorqueAmber);
+        c.Rect(10, 13, 3, 1, new Color("#ffd08a"));
+
+        c.Rect(0, 9, 4, 8, Outline);
+        c.Rect(1, 10, 2, 6, ArmorMid);
+
+        c.Rect(17, 6, 8, 18, Outline);
+        c.Rect(18, 7, 6, 16, TorqueDark);
+        c.Rect(18, 7, 2, 16, TorqueAmber);
+        c.Rect(21, 8, 2, 14, TorqueAmber);
+        c.Rect(19, 13, 3, 3, new Color("#ffd08a"));
+
+        c.Rect(4, 20, 7, 10, Outline);
+        c.Rect(5, 21, 5, 7, ArmorDark);
+        c.Rect(12, 20, 7, 10, Outline);
+        c.Rect(13, 21, 5, 7, ArmorDark);
+
+        c.Rect(3, 27, 8, 3, Outline);
+        c.Rect(11, 27, 8, 3, Outline);
 
         return c.ToTexture();
     }

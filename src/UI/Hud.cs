@@ -68,7 +68,7 @@ public partial class Hud : Control
             var panel = BuildCard(op);
             panel.Position = new Vector2(x, 270f - 66f);
             AddChild(panel);
-            x += 164f;
+            x += 156f;
         }
     }
 
@@ -76,7 +76,7 @@ public partial class Hud : Control
     {
         var c = new OperatorCard { Unit = op };
 
-        var panel = new PanelContainer { CustomMinimumSize = new Vector2(158f, 60f) };
+        var panel = new PanelContainer { CustomMinimumSize = new Vector2(150f, 60f) };
         var sb = new StyleBoxFlat
         {
             BgColor = new Color(0.06f, 0.08f, 0.11f, 0.85f),
@@ -102,10 +102,10 @@ public partial class Hud : Control
         c.NameLabel.AddThemeColorOverride("font_color", op.Def.Accent);
         vbox.AddChild(c.NameLabel);
 
-        c.HpBar = MakeBar(new Color("#e04848"), new Color("#2a1518"), 88f);
+        c.HpBar = MakeBar(new Color("#e04848"), new Color("#2a1518"), 78f);
         vbox.AddChild(c.HpBar);
 
-        c.XpBar = MakeBar(new Color("#4a9eff"), new Color("#141c2a"), 88f);
+        c.XpBar = MakeBar(new Color("#4a9eff"), new Color("#141c2a"), 78f);
         vbox.AddChild(c.XpBar);
 
         c.StatsLabel = new Label { MouseFilter = MouseFilterEnum.Ignore };
@@ -119,7 +119,7 @@ public partial class Hud : Control
         btnBox.MouseFilter = MouseFilterEnum.Ignore;
         hbox.AddChild(btnBox);
 
-        c.ActiveBtn = MakeButton("BURST", op.Def.Accent);
+        c.ActiveBtn = MakeButton(op.Def.ActiveLabel, op.Def.Accent);
         c.ActiveBtn.Pressed += op.ActivateActive;
         btnBox.AddChild(c.ActiveBtn);
 
@@ -228,25 +228,25 @@ public partial class Hud : Control
             return;
         }
 
-        if (u.BurstCooldownRemaining > 0f)
+        if (u.ActiveCooldownRemaining > 0f)
         {
-            c.ActiveBtn.Text = $"BURST {u.BurstCooldownRemaining:0.0}";
+            c.ActiveBtn.Text = $"{u.ActiveCooldownRemaining:0.0}s";
             c.ActiveBtn.Disabled = true;
         }
         else
         {
-            c.ActiveBtn.Text = "BURST";
+            c.ActiveBtn.Text = u.Def.ActiveLabel;
             c.ActiveBtn.Disabled = false;
         }
 
-        if (u.OverdriveRemaining > 0f)
+        if (u.UltStateRemaining > 0f)
         {
-            c.UltBtn.Text = $"OVER x{u.OverdriveRemaining:0.0}";
+            c.UltBtn.Text = $"{u.UltStateRemaining:0.0}s";
             c.UltBtn.Disabled = true;
         }
         else if (u.UltReady)
         {
-            c.UltBtn.Text = "OVERDRIVE!";
+            c.UltBtn.Text = u.Def.UltLabel;
             c.UltBtn.Disabled = false;
         }
         else
