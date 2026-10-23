@@ -1,0 +1,1280 @@
+[
+  {
+    "Name": "operators/striker/idle_0",
+    "Rect": [
+      67,
+      301,
+      17,
+      25
+    ]
+  },
+  {
+    "Name": "operators/striker/idle_1",
+    "Rect": [
+      92,
+      300,
+      17,
+      25
+    ]
+  },
+  {
+    "Name": "operators/striker/idle_2",
+    "Rect": [
+      116,
+      299,
+      16,
+      27
+    ]
+  },
+  {
+    "Name": "operators/striker/idle_3",
+    "Rect": [
+      140,
+      300,
+      17,
+      25
+    ]
+  },
+  {
+    "Name": "operators/volt/idle_0",
+    "Rect": [
+      182,
+      301,
+      18,
+      26
+    ]
+  },
+  {
+    "Name": "operators/volt/idle_1",
+    "Rect": [
+      208,
+      302,
+      17,
+      25
+    ]
+  },
+  {
+    "Name": "operators/volt/idle_2",
+    "Rect": [
+      233,
+      301,
+      17,
+      26
+    ]
+  },
+  {
+    "Name": "operators/volt/idle_3",
+    "Rect": [
+      256,
+      302,
+      18,
+      24
+    ]
+  },
+  {
+    "Name": "operators/hawk/idle_0",
+    "Rect": [
+      302,
+      302,
+      18,
+      25
+    ]
+  },
+  {
+    "Name": "operators/hawk/idle_1",
+    "Rect": [
+      328,
+      301,
+      17,
+      26
+    ]
+  },
+  {
+    "Name": "operators/hawk/idle_2",
+    "Rect": [
+      350,
+      300,
+      19,
+      27
+    ]
+  },
+  {
+    "Name": "operators/hawk/idle_3",
+    "Rect": [
+      375,
+      302,
+      19,
+      24
+    ]
+  },
+  {
+    "Name": "operators/vex/idle_0",
+    "Rect": [
+      423,
+      302,
+      16,
+      24
+    ]
+  },
+  {
+    "Name": "operators/vex/idle_1",
+    "Rect": [
+      447,
+      303,
+      17,
+      24
+    ]
+  },
+  {
+    "Name": "operators/vex/idle_2",
+    "Rect": [
+      472,
+      302,
+      15,
+      25
+    ]
+  },
+  {
+    "Name": "operators/vex/idle_3",
+    "Rect": [
+      495,
+      302,
+      17,
+      25
+    ]
+  },
+  {
+    "Name": "operators/torque/idle_0",
+    "Rect": [
+      540,
+      302,
+      18,
+      25
+    ]
+  },
+  {
+    "Name": "operators/torque/idle_1",
+    "Rect": [
+      564,
+      301,
+      17,
+      26
+    ]
+  },
+  {
+    "Name": "operators/torque/idle_2",
+    "Rect": [
+      588,
+      301,
+      18,
+      24
+    ]
+  },
+  {
+    "Name": "operators/torque/idle_3",
+    "Rect": [
+      612,
+      301,
+      17,
+      25
+    ]
+  },
+  {
+    "Name": "operators/striker/move_0",
+    "Rect": [
+      67,
+      336,
+      17,
+      23
+    ]
+  },
+  {
+    "Name": "operators/striker/move_1",
+    "Rect": [
+      91,
+      335,
+      18,
+      25
+    ]
+  },
+  {
+    "Name": "operators/striker/move_2",
+    "Rect": [
+      116,
+      335,
+      17,
+      25
+    ]
+  },
+  {
+    "Name": "operators/striker/move_3",
+    "Rect": [
+      139,
+      335,
+      18,
+      24
+    ]
+  },
+  {
+    "Name": "operators/volt/move_0",
+    "Rect": [
+      181,
+      337,
+      19,
+      24
+    ]
+  },
+  {
+    "Name": "operators/volt/move_1",
+    "Rect": [
+      206,
+      337,
+      16,
+      23
+    ]
+  },
+  {
+    "Name": "operators/volt/move_2",
+    "Rect": [
+      230,
+      337,
+      18,
+      24
+    ]
+  },
+  {
+    "Name": "operators/volt/move_3",
+    "Rect": [
+      254,
+      337,
+      20,
+      23
+    ]
+  },
+  {
+    "Name": "operators/hawk/move_0",
+    "Rect": [
+      302,
+      337,
+      15,
+      22
+    ]
+  },
+  {
+    "Name": "operators/hawk/move_1",
+    "Rect": [
+      325,
+      337,
+      17,
+      23
+    ]
+  },
+  {
+    "Name": "operators/hawk/move_2",
+    "Rect": [
+      351,
+      336,
+      16,
+      23
+    ]
+  },
+  {
+    "Name": "operators/hawk/move_3",
+    "Rect": [
+      375,
+      336,
+      16,
+      24
+    ]
+  },
+  {
+    "Name": "operators/vex/move_0",
+    "Rect": [
+      422,
+      337,
+      17,
+      23
+    ]
+  },
+  {
+    "Name": "operators/vex/move_1",
+    "Rect": [
+      447,
+      337,
+      16,
+      23
+    ]
+  },
+  {
+    "Name": "operators/vex/move_2",
+    "Rect": [
+      472,
+      337,
+      18,
+      24
+    ]
+  },
+  {
+    "Name": "operators/vex/move_3",
+    "Rect": [
+      495,
+      337,
+      16,
+      23
+    ]
+  },
+  {
+    "Name": "operators/torque/move_0",
+    "Rect": [
+      539,
+      337,
+      20,
+      23
+    ]
+  },
+  {
+    "Name": "operators/torque/move_1",
+    "Rect": [
+      564,
+      337,
+      18,
+      23
+    ]
+  },
+  {
+    "Name": "operators/torque/move_2",
+    "Rect": [
+      587,
+      337,
+      22,
+      18
+    ]
+  },
+  {
+    "Name": "operators/torque/move_3",
+    "Rect": [
+      610,
+      336,
+      20,
+      25
+    ]
+  },
+  {
+    "Name": "operators/striker/attack_0",
+    "Rect": [
+      66,
+      368,
+      17,
+      24
+    ]
+  },
+  {
+    "Name": "operators/striker/attack_1",
+    "Rect": [
+      90,
+      367,
+      18,
+      25
+    ]
+  },
+  {
+    "Name": "operators/striker/attack_2",
+    "Rect": [
+      114,
+      367,
+      17,
+      25
+    ]
+  },
+  {
+    "Name": "operators/striker/attack_3",
+    "Rect": [
+      137,
+      367,
+      19,
+      25
+    ]
+  },
+  {
+    "Name": "operators/volt/attack_0",
+    "Rect": [
+      181,
+      368,
+      17,
+      25
+    ]
+  },
+  {
+    "Name": "operators/volt/attack_1",
+    "Rect": [
+      206,
+      369,
+      17,
+      23
+    ]
+  },
+  {
+    "Name": "operators/volt/attack_2",
+    "Rect": [
+      230,
+      368,
+      18,
+      25
+    ]
+  },
+  {
+    "Name": "operators/volt/attack_3",
+    "Rect": [
+      257,
+      369,
+      15,
+      23
+    ]
+  },
+  {
+    "Name": "operators/hawk/attack_0",
+    "Rect": [
+      303,
+      369,
+      16,
+      23
+    ]
+  },
+  {
+    "Name": "operators/hawk/attack_1",
+    "Rect": [
+      326,
+      368,
+      18,
+      25
+    ]
+  },
+  {
+    "Name": "operators/hawk/attack_2",
+    "Rect": [
+      350,
+      368,
+      18,
+      24
+    ]
+  },
+  {
+    "Name": "operators/hawk/attack_3",
+    "Rect": [
+      375,
+      368,
+      18,
+      24
+    ]
+  },
+  {
+    "Name": "operators/vex/attack_0",
+    "Rect": [
+      422,
+      369,
+      19,
+      23
+    ]
+  },
+  {
+    "Name": "operators/vex/attack_1",
+    "Rect": [
+      448,
+      369,
+      17,
+      24
+    ]
+  },
+  {
+    "Name": "operators/vex/attack_2",
+    "Rect": [
+      471,
+      369,
+      17,
+      24
+    ]
+  },
+  {
+    "Name": "operators/vex/attack_3",
+    "Rect": [
+      495,
+      369,
+      16,
+      23
+    ]
+  },
+  {
+    "Name": "operators/torque/attack_0",
+    "Rect": [
+      540,
+      369,
+      18,
+      23
+    ]
+  },
+  {
+    "Name": "operators/torque/attack_1",
+    "Rect": [
+      565,
+      369,
+      17,
+      24
+    ]
+  },
+  {
+    "Name": "operators/torque/attack_2",
+    "Rect": [
+      583,
+      369,
+      22,
+      24
+    ]
+  },
+  {
+    "Name": "operators/torque/attack_3",
+    "Rect": [
+      606,
+      367,
+      24,
+      25
+    ]
+  },
+  {
+    "Name": "operators/striker/hurt_0",
+    "Rect": [
+      66,
+      401,
+      17,
+      23
+    ]
+  },
+  {
+    "Name": "operators/striker/hurt_1",
+    "Rect": [
+      91,
+      401,
+      17,
+      23
+    ]
+  },
+  {
+    "Name": "operators/striker/hurt_2",
+    "Rect": [
+      116,
+      402,
+      15,
+      22
+    ]
+  },
+  {
+    "Name": "operators/striker/hurt_3",
+    "Rect": [
+      138,
+      401,
+      18,
+      23
+    ]
+  },
+  {
+    "Name": "operators/volt/hurt_0",
+    "Rect": [
+      181,
+      401,
+      17,
+      23
+    ]
+  },
+  {
+    "Name": "operators/volt/hurt_1",
+    "Rect": [
+      208,
+      401,
+      17,
+      24
+    ]
+  },
+  {
+    "Name": "operators/volt/hurt_2",
+    "Rect": [
+      233,
+      401,
+      16,
+      23
+    ]
+  },
+  {
+    "Name": "operators/volt/hurt_3",
+    "Rect": [
+      258,
+      401,
+      15,
+      23
+    ]
+  },
+  {
+    "Name": "operators/hawk/hurt_0",
+    "Rect": [
+      303,
+      401,
+      16,
+      20
+    ]
+  },
+  {
+    "Name": "operators/hawk/hurt_1",
+    "Rect": [
+      328,
+      402,
+      15,
+      21
+    ]
+  },
+  {
+    "Name": "operators/hawk/hurt_2",
+    "Rect": [
+      352,
+      402,
+      16,
+      21
+    ]
+  },
+  {
+    "Name": "operators/hawk/hurt_3",
+    "Rect": [
+      374,
+      401,
+      18,
+      22
+    ]
+  },
+  {
+    "Name": "operators/vex/hurt_0",
+    "Rect": [
+      423,
+      402,
+      16,
+      22
+    ]
+  },
+  {
+    "Name": "operators/vex/hurt_1",
+    "Rect": [
+      448,
+      402,
+      14,
+      22
+    ]
+  },
+  {
+    "Name": "operators/vex/hurt_2",
+    "Rect": [
+      472,
+      402,
+      16,
+      22
+    ]
+  },
+  {
+    "Name": "operators/vex/hurt_3",
+    "Rect": [
+      495,
+      402,
+      16,
+      22
+    ]
+  },
+  {
+    "Name": "operators/torque/hurt_0",
+    "Rect": [
+      541,
+      401,
+      17,
+      23
+    ]
+  },
+  {
+    "Name": "operators/torque/hurt_1",
+    "Rect": [
+      564,
+      401,
+      18,
+      23
+    ]
+  },
+  {
+    "Name": "operators/torque/hurt_2",
+    "Rect": [
+      585,
+      401,
+      21,
+      23
+    ]
+  },
+  {
+    "Name": "operators/torque/hurt_3",
+    "Rect": [
+      610,
+      402,
+      18,
+      21
+    ]
+  },
+  {
+    "Name": "operators/striker/defeat_0",
+    "Rect": [
+      67,
+      433,
+      16,
+      22
+    ]
+  },
+  {
+    "Name": "operators/striker/defeat_1",
+    "Rect": [
+      91,
+      432,
+      18,
+      22
+    ]
+  },
+  {
+    "Name": "operators/striker/defeat_2",
+    "Rect": [
+      116,
+      432,
+      17,
+      24
+    ]
+  },
+  {
+    "Name": "operators/striker/defeat_3",
+    "Rect": [
+      140,
+      433,
+      17,
+      22
+    ]
+  },
+  {
+    "Name": "operators/volt/defeat_0",
+    "Rect": [
+      182,
+      434,
+      17,
+      22
+    ]
+  },
+  {
+    "Name": "operators/volt/defeat_1",
+    "Rect": [
+      208,
+      434,
+      16,
+      23
+    ]
+  },
+  {
+    "Name": "operators/volt/defeat_2",
+    "Rect": [
+      233,
+      434,
+      16,
+      21
+    ]
+  },
+  {
+    "Name": "operators/volt/defeat_3",
+    "Rect": [
+      258,
+      434,
+      16,
+      21
+    ]
+  },
+  {
+    "Name": "operators/hawk/defeat_0",
+    "Rect": [
+      304,
+      434,
+      15,
+      22
+    ]
+  },
+  {
+    "Name": "operators/hawk/defeat_1",
+    "Rect": [
+      329,
+      433,
+      16,
+      22
+    ]
+  },
+  {
+    "Name": "operators/hawk/defeat_2",
+    "Rect": [
+      352,
+      433,
+      17,
+      22
+    ]
+  },
+  {
+    "Name": "operators/hawk/defeat_3",
+    "Rect": [
+      376,
+      434,
+      18,
+      21
+    ]
+  },
+  {
+    "Name": "operators/vex/defeat_0",
+    "Rect": [
+      423,
+      435,
+      16,
+      22
+    ]
+  },
+  {
+    "Name": "operators/vex/defeat_1",
+    "Rect": [
+      448,
+      435,
+      14,
+      22
+    ]
+  },
+  {
+    "Name": "operators/vex/defeat_2",
+    "Rect": [
+      471,
+      434,
+      16,
+      23
+    ]
+  },
+  {
+    "Name": "operators/vex/defeat_3",
+    "Rect": [
+      495,
+      434,
+      17,
+      23
+    ]
+  },
+  {
+    "Name": "operators/torque/defeat_0",
+    "Rect": [
+      541,
+      434,
+      20,
+      22
+    ]
+  },
+  {
+    "Name": "operators/torque/defeat_1",
+    "Rect": [
+      561,
+      434,
+      21,
+      22
+    ]
+  },
+  {
+    "Name": "operators/torque/defeat_2",
+    "Rect": [
+      585,
+      434,
+      23,
+      22
+    ]
+  },
+  {
+    "Name": "operators/torque/defeat_3",
+    "Rect": [
+      612,
+      433,
+      18,
+      22
+    ]
+  },
+  {
+    "Name": "enemies/watcher/idle_0",
+    "Rect": [
+      676,
+      301,
+      18,
+      14
+    ]
+  },
+  {
+    "Name": "enemies/watcher/idle_1",
+    "Rect": [
+      704,
+      300,
+      21,
+      16
+    ]
+  },
+  {
+    "Name": "enemies/watcher/move_0",
+    "Rect": [
+      675,
+      335,
+      19,
+      22
+    ]
+  },
+  {
+    "Name": "enemies/watcher/move_1",
+    "Rect": [
+      704,
+      334,
+      21,
+      23
+    ]
+  },
+  {
+    "Name": "enemies/watcher/attack_0",
+    "Rect": [
+      675,
+      369,
+      19,
+      24
+    ]
+  },
+  {
+    "Name": "enemies/watcher/attack_1",
+    "Rect": [
+      704,
+      370,
+      21,
+      23
+    ]
+  },
+  {
+    "Name": "enemies/watcher/hurt_0",
+    "Rect": [
+      675,
+      408,
+      19,
+      18
+    ]
+  },
+  {
+    "Name": "enemies/watcher/hurt_1",
+    "Rect": [
+      704,
+      408,
+      21,
+      18
+    ]
+  },
+  {
+    "Name": "enemies/watcher/defeat_0",
+    "Rect": [
+      675,
+      439,
+      19,
+      19
+    ]
+  },
+  {
+    "Name": "enemies/watcher/defeat_1",
+    "Rect": [
+      705,
+      440,
+      21,
+      18
+    ]
+  },
+  {
+    "Name": "enemies/hunter/idle_0",
+    "Rect": [
+      758,
+      301,
+      21,
+      19
+    ]
+  },
+  {
+    "Name": "enemies/hunter/idle_1",
+    "Rect": [
+      785,
+      301,
+      24,
+      22
+    ]
+  },
+  {
+    "Name": "enemies/hunter/idle_2",
+    "Rect": [
+      816,
+      302,
+      20,
+      15
+    ]
+  },
+  {
+    "Name": "enemies/hunter/move_0",
+    "Rect": [
+      759,
+      336,
+      20,
+      21
+    ]
+  },
+  {
+    "Name": "enemies/hunter/move_1",
+    "Rect": [
+      788,
+      337,
+      21,
+      19
+    ]
+  },
+  {
+    "Name": "enemies/hunter/move_2",
+    "Rect": [
+      817,
+      336,
+      22,
+      15
+    ]
+  },
+  {
+    "Name": "enemies/hunter/attack_0",
+    "Rect": [
+      759,
+      371,
+      19,
+      22
+    ]
+  },
+  {
+    "Name": "enemies/hunter/attack_1",
+    "Rect": [
+      788,
+      371,
+      19,
+      19
+    ]
+  },
+  {
+    "Name": "enemies/hunter/attack_2",
+    "Rect": [
+      817,
+      371,
+      19,
+      21
+    ]
+  },
+  {
+    "Name": "enemies/hunter/hurt_0",
+    "Rect": [
+      757,
+      406,
+      18,
+      20
+    ]
+  },
+  {
+    "Name": "enemies/hunter/hurt_1",
+    "Rect": [
+      786,
+      408,
+      21,
+      15
+    ]
+  },
+  {
+    "Name": "enemies/hunter/hurt_2",
+    "Rect": [
+      814,
+      408,
+      24,
+      15
+    ]
+  },
+  {
+    "Name": "enemies/hunter/defeat_0",
+    "Rect": [
+      760,
+      438,
+      18,
+      19
+    ]
+  },
+  {
+    "Name": "enemies/hunter/defeat_1",
+    "Rect": [
+      786,
+      441,
+      21,
+      15
+    ]
+  },
+  {
+    "Name": "enemies/hunter/defeat_2",
+    "Rect": [
+      816,
+      440,
+      21,
+      17
+    ]
+  },
+  {
+    "Name": "enemies/enforcer/idle_0",
+    "Rect": [
+      873,
+      301,
+      15,
+      25
+    ]
+  },
+  {
+    "Name": "enemies/enforcer/idle_1",
+    "Rect": [
+      902,
+      300,
+      19,
+      25
+    ]
+  },
+  {
+    "Name": "enemies/enforcer/idle_2",
+    "Rect": [
+      928,
+      301,
+      18,
+      24
+    ]
+  },
+  {
+    "Name": "enemies/enforcer/move_0",
+    "Rect": [
+      872,
+      335,
+      20,
+      25
+    ]
+  },
+  {
+    "Name": "enemies/enforcer/move_1",
+    "Rect": [
+      899,
+      335,
+      23,
+      26
+    ]
+  },
+  {
+    "Name": "enemies/enforcer/move_2",
+    "Rect": [
+      926,
+      335,
+      25,
+      24
+    ]
+  },
+  {
+    "Name": "enemies/enforcer/attack_0",
+    "Rect": [
+      871,
+      369,
+      20,
+      26
+    ]
+  },
+  {
+    "Name": "enemies/enforcer/attack_1",
+    "Rect": [
+      902,
+      373,
+      16,
+      21
+    ]
+  },
+  {
+    "Name": "enemies/enforcer/attack_2",
+    "Rect": [
+      928,
+      369,
+      24,
+      26
+    ]
+  },
+  {
+    "Name": "enemies/enforcer/hurt_0",
+    "Rect": [
+      867,
+      405,
+      26,
+      22
+    ]
+  },
+  {
+    "Name": "enemies/enforcer/hurt_1",
+    "Rect": [
+      897,
+      405,
+      25,
+      22
+    ]
+  },
+  {
+    "Name": "enemies/enforcer/hurt_2",
+    "Rect": [
+      925,
+      404,
+      28,
+      23
+    ]
+  },
+  {
+    "Name": "enemies/enforcer/defeat_0",
+    "Rect": [
+      874,
+      435,
+      17,
+      15
+    ]
+  },
+  {
+    "Name": "enemies/enforcer/defeat_1",
+    "Rect": [
+      901,
+      435,
+      20,
+      24
+    ]
+  },
+  {
+    "Name": "enemies/enforcer/defeat_2",
+    "Rect": [
+      929,
+      435,
+      19,
+      24
+    ]
+  },
+  {
+    "Name": "enemies/warden/idle_0",
+    "Rect": [
+      979,
+      301,
+      74,
+      75
+    ]
+  },
+  {
+    "Name": "enemies/warden/attack_0",
+    "Rect": [
+      979,
+      374,
+      70,
+      86
+    ]
+  }
+]
