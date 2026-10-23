@@ -1,6 +1,7 @@
 using Godot;
 using ProtocolZero.Combat;
 using ProtocolZero.Core;
+using ProtocolZero.Data;
 
 namespace ProtocolZero.UI;
 
@@ -8,6 +9,7 @@ public partial class Hud : Control
 {
     CombatManager _combat = null!;
     RecruitPanel _recruitPanel = null!;
+    ArmoryPanel _armoryPanel = null!;
     Label _creditsLabel = null!;
     Label _sectorLabel = null!;
     HBoxContainer _cardRow = null!;
@@ -25,16 +27,18 @@ public partial class Hud : Control
         public Button UltBtn = null!;
     }
 
-    public void Init(CombatManager combat, RecruitPanel recruitPanel)
+    public void Init(CombatManager combat, RecruitPanel recruitPanel, ArmoryPanel armoryPanel)
     {
         _combat = combat;
         _recruitPanel = recruitPanel;
+        _armoryPanel = armoryPanel;
         Build();
 
         GameState.Instance.CreditsChanged += OnCreditsChanged;
         GameState.Instance.XpChanged += OnXpChanged;
         _combat.WaveChanged += OnWaveChanged;
         _combat.RewardsAwarded += OnRewards;
+        _combat.ItemDropped += OnItemDropped;
 
         OnCreditsChanged(GameState.Instance.Credits);
         OnWaveChanged(_combat.Wave);
@@ -56,6 +60,11 @@ public partial class Hud : Control
         squadBtn.Position = new Vector2(100f, 3f);
         squadBtn.Pressed += _recruitPanel.Open;
         AddChild(squadBtn);
+
+        var armoryBtn = MakeButton("ARMORY", new Color("#f0a030"));
+        armoryBtn.Position = new Vector2(164f, 3f);
+        armoryBtn.Pressed += _armoryPanel.Open;
+        AddChild(armoryBtn);
 
         _sectorLabel = new Label
         {
@@ -288,30 +297,55 @@ public partial class Hud : Control
 
     void OnWaveChanged(int wave)
     {
+        var cfg = Balance.Instance.Config;
         int sector = (wave - 1) / 5 + 1;
         int node = (wave - 1) % 5 + 1;
-        _sectorLabel.Text = $"SECTOR {sector}-{node}";
+        bool boss = cfg.BossWaveInterval > 0 && wave % cfg.BossWaveInterval == 0;
+        bool elite = !boss && cfg.EliteWaveInterval > 0 && wave % cfg.EliteWaveInterval == 0;
+
+        _sectorLabel.Text = boss ? $"SECTOR {sector}-{node}  WARDEN"
+            : elite ? $"SECTOR {sector}-{node}  ELITE"
+            : $"SECTOR {sector}-{node}";
+        _sectorLabel.AddThemeColorOverride("font_color",
+            boss ? new Color("#e04848") : elite ? new Color("#f0a030") : new Color("#9fb2c8"));
     }
 
     void OnRewards(long credits, float xp)
     {
+        SpawnToast($"+{credits:N0} CR   +{Mathf.CeilToInt(xp)} XP", new Color("#ffd75e"), 24f);
+    }
+
+    void OnItemDropped(EquipmentDef item)
+    {
+        var rarity = item.Rarity switch
+        {
+            "legendary" => new Color("#ffd75e"),
+            "epic" => new Color("#c06ae0"),
+            "rare" => new Color("#4a9eff"),
+            _ => new Color("#9fb2c8"),
+        };
+        SpawnToast($"LOOT  [{item.Rarity.ToUpperInvariant()}] {item.DisplayName}", rarity, 38f);
+    }
+
+    void SpawnToast(string text, Color color, float y)
+    {
         var label = new Label
         {
-            Text = $"+{credits:N0} CR   +{Mathf.CeilToInt(xp)} XP",
+            Text = text,
             HorizontalAlignment = HorizontalAlignment.Center,
-            Position = new Vector2(140f, 24f),
+            Position = new Vector2(140f, y),
             Size = new Vector2(200f, 14f),
             MouseFilter = MouseFilterEnum.Ignore,
         };
         label.AddThemeFontSizeOverride("font_size", 9);
-        label.AddThemeColorOverride("font_color", new Color("#ffd75e"));
+        label.AddThemeColorOverride("font_color", color);
         label.AddThemeColorOverride("font_outline_color", new Color(0f, 0f, 0f, 0.9f));
         label.AddThemeConstantOverride("outline_size", 3);
         AddChild(label);
 
         var tw = label.CreateTween();
-        tw.TweenProperty(label, "position:y", 12f, 0.8f).SetEase(Tween.EaseType.Out);
-        tw.Parallel().TweenProperty(label, "modulate:a", 0f, 0.35f).SetDelay(0.45f);
+        tw.TweenProperty(label, "position:y", y - 12f, 0.8f).SetEase(Tween.EaseType.Out);
+        tw.Parallel().TweenProperty(label, "modulate:a", 0f, 0.35f).SetDelay(0.7f);
         tw.TweenCallback(Callable.From(label.QueueFree));
     }
 }

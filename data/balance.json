@@ -17,6 +17,12 @@
   "overdrive_duration_sec": 6.0,
   "ultimate_charge_per_attack": 0.05,
   "elite_wave_interval": 5,
+  "boss_wave_interval": 10,
+  "boss_escort_count": 2,
+  "boss_milestone_bonus_credits": 750,
+  "hunter_drone_from_wave": 4,
+  "hunter_drone_ramp_waves": 6,
+  "target_analysis_bonus_mult": 1.15,
   "projectile_speed": 260.0,
   "squad_size": 3,
   "default_squad": ["torque", "striker", "vex"],
@@ -50,5 +56,14 @@
   "fortify_taken_mult": 0.8,
   "fortress_taken_mult": 0.6,
   "fortress_shield_pct": 0.6,
-  "fortress_sec": 6.0
+  "fortress_sec": 6.0,
+  "drop_chance": 0.15,
+  "drop_chance_boss": 1.0,
+  "rarity_rolls_max": 4,
+  "rarity_weights": [70.0, 25.0, 4.0, 1.0],
+  "upgrade_base_cost": 200,
+  "upgrade_cost_growth": 1.35,
+  "upgrade_max_rank": 10,
+  "upgrade_stat_per_rank_pct": 0.05,
+  "upgrade_tech_cooldown_pct": 0.04
 }

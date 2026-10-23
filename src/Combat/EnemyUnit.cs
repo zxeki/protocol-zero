@@ -47,9 +47,17 @@ public partial class EnemyUnit : Combatant
         Sprite.Texture = Def.Id switch
         {
             "enforcer" => PixelArt.BuildEnforcer(),
+            "hunter_drone" => PixelArt.BuildHunterDrone(),
+            "the_warden" => PixelArt.BuildWarden(),
             _ => PixelArt.BuildWatcher(),
         };
-        VisualHeight = Def.Id == "enforcer" ? 32f : 16f;
+        VisualHeight = Def.Id switch
+        {
+            "enforcer" => 32f,
+            "hunter_drone" => 14f,
+            "the_warden" => 52f,
+            _ => 16f,
+        };
         SpriteBaseOffset = new Vector2(0f, -VisualHeight / 2f);
         Sprite.Position = SpriteBaseOffset;
         _boltTexture = PixelArt.BuildBolt(new Color("#ffd2c4"), new Color("#e0483a"));
@@ -76,7 +84,11 @@ public partial class EnemyUnit : Combatant
     public override void TakeDamage(float amount)
     {
         if (IsMarked)
+        {
             amount *= Balance.Instance.Config.MarkBonusMult;
+            if (_manager.GetPassiveCarrier("target_analysis") != null)
+                amount *= Balance.Instance.Config.TargetAnalysisBonusMult;
+        }
         base.TakeDamage(amount);
     }
 
@@ -134,9 +146,9 @@ public partial class EnemyUnit : Combatant
 
     OperatorUnit? ResolveTarget()
     {
-        var torque = _manager.GetTorque();
-        if (torque != null && torque.FortressTauntRemaining > 0f)
-            return torque;
+        var taunter = _manager.GetFortressTaunter();
+        if (taunter != null)
+            return taunter;
 
         if (_targetRef != null && GodotObject.IsInstanceValid(_targetRef) && _targetRef.IsAlive)
             return _targetRef;

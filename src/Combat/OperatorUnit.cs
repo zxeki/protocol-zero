@@ -49,16 +49,38 @@ public partial class OperatorUnit : Combatant
         ApplyStats();
     }
 
-    void ApplyStats()
+    void ApplyStats() => ApplyStats(true);
+
+    void ApplyStats(bool fullHeal)
     {
         var cfg = Balance.Instance.Config;
+        var gs = GameState.Instance;
         float hpMult = 1f + cfg.HpPerLevelPct * (Level - 1);
         float atkMult = 1f + cfg.AttackPerLevelPct * (Level - 1);
-        MaxHp = Def.BaseHp * hpMult;
-        Hp = MaxHp;
-        BaseAttack = Def.BaseAttack * atkMult;
+        var (eqAtk, eqHp) = gs.EquipBonus(Def.Id);
+        var up = gs.UpgradesFor(Def.Id);
+        float powerMult = 1f + cfg.UpgradeStatPerRankPct * up.PowerRank;
+
+        float prevFrac = MaxHp > 0f ? Hp / MaxHp : 1f;
+        MaxHp = (Def.BaseHp * hpMult + eqHp) * powerMult;
+        BaseAttack = (Def.BaseAttack * atkMult + eqAtk) * powerMult;
         AttackInterval = Def.AttackInterval;
+        if (fullHeal)
+            Hp = MaxHp;
+        else if (IsAlive)
+            Hp = Mathf.Clamp(prevFrac * MaxHp, 1f, MaxHp);
+        else
+            Hp = 0f;
         Bar?.SetBar(Hp, MaxHp, Shield);
+    }
+
+    public void RefreshStats() => ApplyStats(false);
+
+    public float EffectiveActiveCooldown()
+    {
+        var cfg = Balance.Instance.Config;
+        int tech = GameState.Instance.UpgradesFor(Def.Id).TechRank;
+        return MathF.Max(1f, Def.ActiveCooldownSec * (1f - cfg.UpgradeTechCooldownPct * tech));
     }
 
     protected override void BuildVisuals()
@@ -257,7 +279,7 @@ public partial class OperatorUnit : Combatant
         if (!ActiveReady)
             return;
         var cfg = Balance.Instance.Config;
-        _activeCooldownTimer = Def.ActiveCooldownSec;
+        _activeCooldownTimer = EffectiveActiveCooldown();
 
         switch (Def.ActiveId)
         {
@@ -470,8 +492,8 @@ public partial class OperatorUnit : Combatant
             return;
 
         var cfg = Balance.Instance.Config;
-        var torque = _manager.GetTorque();
-        if (torque != null && torque.IsAlive)
+        var fortifier = _manager.GetPassiveCarrier("fortified_plating");
+        if (fortifier != null)
             amount *= cfg.FortifyTakenMult;
         if (_barrierTimer > 0f)
             amount *= cfg.BarrierTakenMult;
