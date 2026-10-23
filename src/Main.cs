@@ -13,6 +13,9 @@ public partial class Main : Node2D
 
     public override void _Ready()
     {
+        DisplayServer.WindowSetFlag(DisplayServer.WindowFlags.AlwaysOnTop,
+            GameState.Instance.Settings.AlwaysOnTop);
+
         var battlefield = new Battlefield();
         AddChild(battlefield);
 
@@ -34,6 +37,9 @@ public partial class Main : Node2D
         hudLayer.AddChild(armoryPanel);
 
         _hud.Init(_combat, recruitPanel, armoryPanel);
+
+        if (GameState.Instance.OfflineSummary is { } offline)
+            _hud.ShowOfflineSummary(offline);
 
         GameState.Instance.SquadChanged += OnSquadChanged;
 

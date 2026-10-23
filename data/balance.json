@@ -65,5 +65,9 @@
   "upgrade_cost_growth": 1.35,
   "upgrade_max_rank": 10,
   "upgrade_stat_per_rank_pct": 0.05,
-  "upgrade_tech_cooldown_pct": 0.04
+  "upgrade_tech_cooldown_pct": 0.04,
+  "offline_credits_per_hour": 120.0,
+  "offline_xp_per_hour": 60.0,
+  "offline_cap_hours": 8.0,
+  "offline_min_minutes": 2.0
 }

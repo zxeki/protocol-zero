@@ -132,6 +132,11 @@ public sealed class BalanceConfig
     public int UpgradeMaxRank { get; set; } = 10;
     public float UpgradeStatPerRankPct { get; set; } = 0.05f;
     public float UpgradeTechCooldownPct { get; set; } = 0.04f;
+
+    public float OfflineCreditsPerHour { get; set; } = 120f;
+    public float OfflineXpPerHour { get; set; } = 60f;
+    public float OfflineCapHours { get; set; } = 8f;
+    public float OfflineMinMinutes { get; set; } = 2f;
 }
 
 public sealed class SaveData
@@ -145,6 +150,21 @@ public sealed class SaveData
     public Dictionary<string, int> Inventory { get; set; } = new();
     public Dictionary<string, Dictionary<string, string>> Loadout { get; set; } = new();
     public Dictionary<string, SavedUpgrades> Upgrades { get; set; } = new();
+    public string? LastSaveUtc { get; set; }
+}
+
+public sealed class UserSettings
+{
+    public int Version { get; set; } = 1;
+    public bool OfflineRewardsEnabled { get; set; } = true;
+    public bool AlwaysOnTop { get; set; }
+}
+
+public sealed class OfflineSummary
+{
+    public float Hours { get; set; }
+    public long Credits { get; set; }
+    public float Xp { get; set; }
 }
 
 public sealed class SavedOperator

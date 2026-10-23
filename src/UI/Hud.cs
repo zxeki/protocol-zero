@@ -330,6 +330,16 @@ public partial class Hud : Control
         SpawnToast($"LOOT  [{item.Rarity.ToUpperInvariant()}] {item.DisplayName}", rarity, 38f);
     }
 
+    public void ShowOfflineSummary(OfflineSummary summary)
+    {
+        int totalMinutes = Mathf.Max(1, (int)(summary.Hours * 60f));
+        string duration = totalMinutes >= 60
+            ? $"{totalMinutes / 60}h {totalMinutes % 60:D2}m"
+            : $"{totalMinutes}m";
+        SpawnToast($"OFFLINE {duration}  +{summary.Credits:N0} CR  +{Mathf.CeilToInt(summary.Xp)} XP",
+            new Color("#3ecfb2"), 56f);
+    }
+
     void SpawnToast(string text, Color color, float y)
     {
         var label = new Label

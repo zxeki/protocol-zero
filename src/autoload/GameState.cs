@@ -10,6 +10,7 @@ public partial class GameState : Node
     public static GameState Instance { get; private set; } = null!;
 
     const string SavePath = "user://save.json";
+    const string SettingsPath = "user://settings.json";
 
     public sealed class OperatorProgress
     {
@@ -27,11 +28,17 @@ public partial class GameState : Node
     public Dictionary<string, Dictionary<string, string>> Loadout { get; } = new();
     public Dictionary<string, SavedUpgrades> Upgrades { get; } = new();
 
+    public UserSettings Settings { get; private set; } = new();
+    public OfflineSummary? OfflineSummary { get; private set; }
+
     public event Action<long>? CreditsChanged;
     public event Action<string, OperatorProgress>? XpChanged;
     public event Action<string>? OwnedChanged;
     public event Action? SquadChanged;
     public event Action? EquipmentChanged;
+    public event Action? SettingsChanged;
+
+    string? _loadedLastSaveUtc;
 
     public override void _Ready()
     {
@@ -41,6 +48,9 @@ public partial class GameState : Node
 
         if (!TryLoad())
             InitNewGame();
+
+        LoadSettings();
+        EvaluateOfflineRewards();
     }
 
     void InitNewGame()
@@ -72,6 +82,7 @@ public partial class GameState : Node
         }
 
         GD.Print($"[GameState] New game: {Owned.Count} owned, squad [{string.Join(", ", Squad)}], {Credits} CR");
+        Save();
     }
 
     public void AddCredits(long amount)
@@ -319,6 +330,7 @@ public partial class GameState : Node
             Upgrades = Upgrades.ToDictionary(
                 kv => kv.Key,
                 kv => new SavedUpgrades { PowerRank = kv.Value.PowerRank, TechRank = kv.Value.TechRank }),
+            LastSaveUtc = DateTimeOffset.UtcNow.ToString("O"),
         };
 
         try
@@ -358,6 +370,8 @@ public partial class GameState : Node
 
         if (data == null)
             return false;
+
+        _loadedLastSaveUtc = data.LastSaveUtc;
 
         var cfg = Balance.Instance.Config;
         var validIds = Balance.Instance.Operators.Select(o => o.Id).ToHashSet();
@@ -446,5 +460,97 @@ public partial class GameState : Node
         GD.Print($"[GameState] Loaded save: {Owned.Count} owned, squad [{string.Join(", ", Squad)}], {Credits} CR"
             + (Inventory.Count > 0 ? $", {Inventory.Values.Sum()} items" : ""));
         return true;
+    }
+
+    void EvaluateOfflineRewards()
+    {
+        var cfg = Balance.Instance.Config;
+        float awayHours = 0f;
+
+        if (Settings.OfflineRewardsEnabled && !string.IsNullOrEmpty(_loadedLastSaveUtc)
+            && DateTimeOffset.TryParse(_loadedLastSaveUtc, null,
+                System.Globalization.DateTimeStyles.None, out var savedAt))
+        {
+            float elapsed = (float)(DateTimeOffset.UtcNow - savedAt).TotalHours;
+            if (elapsed > 0f && elapsed * 60f >= cfg.OfflineMinMinutes)
+                awayHours = elapsed;
+        }
+
+        float rewardHours = Mathf.Min(awayHours, cfg.OfflineCapHours);
+        long credits = rewardHours > 0f ? (long)MathF.Floor(rewardHours * cfg.OfflineCreditsPerHour) : 0L;
+        float xp = rewardHours > 0f ? MathF.Floor(rewardHours * cfg.OfflineXpPerHour) : 0f;
+
+        if (credits > 0)
+        {
+            Credits += credits;
+            CreditsChanged?.Invoke(Credits);
+        }
+        if (xp > 0f)
+        {
+            foreach (var id in Squad)
+                AddXp(id, xp);
+        }
+
+        if (credits > 0 || xp > 0f)
+        {
+            OfflineSummary = new OfflineSummary { Hours = awayHours, Credits = credits, Xp = xp };
+            GD.Print($"[GameState] Offline: {awayHours:0.##}h away (reward {rewardHours:0.##}h)"
+                + $" -> +{credits} CR, +{xp:0} XP per squad member");
+        }
+
+        Save();
+    }
+
+    void LoadSettings()
+    {
+        Settings = new UserSettings();
+        if (!FileAccess.FileExists(SettingsPath))
+        {
+            SaveSettings();
+            return;
+        }
+
+        try
+        {
+            using var file = FileAccess.Open(SettingsPath, FileAccess.ModeFlags.Read);
+            var data = file != null
+                ? JsonSerializer.Deserialize<UserSettings>(file.GetAsText(), Data.Json.Options)
+                : null;
+            if (data != null && data.Version >= 1)
+                Settings = data;
+            else
+                SaveSettings();
+        }
+        catch (Exception e)
+        {
+            GD.PrintErr($"[GameState] Settings load failed, using defaults: {e.Message}");
+            Settings = new UserSettings();
+            SaveSettings();
+        }
+    }
+
+    public void UpdateSettings(Action<UserSettings> mutate)
+    {
+        mutate(Settings);
+        SaveSettings();
+        SettingsChanged?.Invoke();
+    }
+
+    void SaveSettings()
+    {
+        try
+        {
+            using var file = FileAccess.Open(SettingsPath, FileAccess.ModeFlags.Write);
+            if (file == null)
+            {
+                GD.PrintErr($"[GameState] Cannot write {SettingsPath}");
+                return;
+            }
+            file.StoreString(JsonSerializer.Serialize(Settings, Data.Json.Options));
+        }
+        catch (Exception e)
+        {
+            GD.PrintErr($"[GameState] Settings save failed: {e.Message}");
+        }
     }
 }
