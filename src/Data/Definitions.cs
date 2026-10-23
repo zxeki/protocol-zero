@@ -75,6 +75,7 @@ public sealed class BalanceConfig
 
     public int SquadSize { get; set; } = 3;
     public List<string> DefaultSquad { get; set; } = new() { "torque", "striker", "vex" };
+    public long StartingCredits { get; set; }
 
     public int EnemiesPerWaveBase { get; set; } = 1;
     public int EnemiesPerWaveGrowthDivisor { get; set; } = 3;
@@ -113,4 +114,19 @@ public sealed class BalanceConfig
     public float FortressTakenMult { get; set; } = 0.6f;
     public float FortressShieldPct { get; set; } = 0.6f;
     public float FortressSec { get; set; } = 6.0f;
+}
+
+public sealed class SaveData
+{
+    public int Version { get; set; } = 1;
+    public long Credits { get; set; }
+    public List<string> Owned { get; set; } = new();
+    public List<string> Squad { get; set; } = new();
+    public Dictionary<string, SavedOperator> Operators { get; set; } = new();
+}
+
+public sealed class SavedOperator
+{
+    public int Level { get; set; } = 1;
+    public float Xp { get; set; }
 }

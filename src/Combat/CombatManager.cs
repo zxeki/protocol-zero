@@ -32,7 +32,7 @@ public partial class CombatManager : Node2D
         float[] slotX = { 304f, 264f, 224f };
         int slot = 0;
 
-        foreach (var id in cfg.DefaultSquad)
+        foreach (var id in GameState.Instance.Squad)
         {
             if (slot >= cfg.SquadSize || slot >= slotX.Length)
                 break;
@@ -54,6 +54,20 @@ public partial class CombatManager : Node2D
         }
 
         GD.Print($"[Combat] Squad deployed ({Operators.Count}/{cfg.SquadSize}): {string.Join(", ", Operators.Select(o => o.Def.Id))}");
+    }
+
+    public void RespawnSquad()
+    {
+        SetFocus(null);
+
+        foreach (var op in Operators)
+        {
+            if (GodotObject.IsInstanceValid(op))
+                op.QueueFree();
+        }
+        Operators.Clear();
+
+        SpawnSquad();
     }
 
     public void StartCombat() => SpawnNextWave();

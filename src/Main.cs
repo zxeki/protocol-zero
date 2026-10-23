@@ -1,5 +1,6 @@
 using Godot;
 using ProtocolZero.Combat;
+using ProtocolZero.Core;
 using ProtocolZero.UI;
 using ProtocolZero.World;
 
@@ -8,6 +9,7 @@ namespace ProtocolZero;
 public partial class Main : Node2D
 {
     CombatManager _combat = null!;
+    Hud _hud = null!;
 
     public override void _Ready()
     {
@@ -20,11 +22,30 @@ public partial class Main : Node2D
 
         var hudLayer = new CanvasLayer();
         AddChild(hudLayer);
-        var hud = new Hud();
-        hudLayer.AddChild(hud);
-        hud.Init(_combat);
+
+        _hud = new Hud();
+        hudLayer.AddChild(_hud);
+
+        var recruitPanel = new RecruitPanel();
+        hudLayer.AddChild(recruitPanel);
+
+        _hud.Init(_combat, recruitPanel);
+
+        GameState.Instance.SquadChanged += OnSquadChanged;
 
         _combat.StartCombat();
+    }
+
+    void OnSquadChanged()
+    {
+        _combat.RespawnSquad();
+        _hud.RebuildCards();
+    }
+
+    public override void _Notification(int what)
+    {
+        if (what == NotificationWMCloseRequest)
+            GameState.Instance.Save();
     }
 
     public override void _UnhandledInput(InputEvent @event)
