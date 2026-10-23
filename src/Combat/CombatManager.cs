@@ -123,8 +123,19 @@ public partial class CombatManager : Node2D
                 hunters = Mathf.Clamp(hunters, 0, count - 1);
             }
 
+            int arena = Battlefield.ArenaIndex(Wave);
+            int enforcers = arena == 1 ? Mathf.Clamp(count / 3, 0, Mathf.Max(0, count - hunters)) : 0;
+            if (arena == 2)
+                hunters = Mathf.Max(hunters, count / 2);
+
             for (int i = 0; i < count; i++)
-                SpawnEnemy(i >= count - hunters ? "hunter_drone" : "watcher", i, false);
+            {
+                string id =
+                    i >= count - hunters ? "hunter_drone" :
+                    i < enforcers ? "enforcer" :
+                    "watcher";
+                SpawnEnemy(id, i, false);
+            }
         }
     }
 

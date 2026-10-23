@@ -22,7 +22,20 @@ public abstract partial class Combatant : Node2D
     protected HealthBar Bar = null!;
     protected Vector2 SpriteBaseOffset = Vector2.Zero;
 
+    protected Texture2D[] IdleFrames = System.Array.Empty<Texture2D>();
+    protected Texture2D[] MoveFrames = System.Array.Empty<Texture2D>();
+    protected Texture2D[] AttackFrames = System.Array.Empty<Texture2D>();
+    protected Texture2D[] HurtFrames = System.Array.Empty<Texture2D>();
+    protected Texture2D[] DefeatFrames = System.Array.Empty<Texture2D>();
+    protected float AttackPoseTimer;
+
     float _flashTimer;
+    float _hurtPoseTimer;
+    float _animTimer;
+    int _animIndex;
+    Texture2D[]? _animRow;
+
+    protected virtual bool IsMoving => false;
 
     public override void _Ready()
     {
@@ -62,6 +75,7 @@ public abstract partial class Combatant : Node2D
 
         Bar.SetBar(Hp, MaxHp, Shield);
         _flashTimer = 0.12f;
+        _hurtPoseTimer = 0.12f;
         Damaged?.Invoke(this, amount);
         OnDamagedFeedback();
 
@@ -106,6 +120,59 @@ public abstract partial class Combatant : Node2D
         else if (Sprite.Modulate != Colors.White)
         {
             Sprite.Modulate = Colors.White;
+        }
+
+        UpdateAnimation(delta);
+    }
+
+    void UpdateAnimation(double delta)
+    {
+        if (IdleFrames.Length == 0)
+            return;
+
+        float dt = (float)delta;
+        if (_hurtPoseTimer > 0f)
+            _hurtPoseTimer -= dt;
+        if (AttackPoseTimer > 0f)
+            AttackPoseTimer -= dt;
+
+        var row =
+            !IsAlive && DefeatFrames.Length > 0 ? DefeatFrames :
+            _hurtPoseTimer > 0f && HurtFrames.Length > 0 ? HurtFrames :
+            AttackPoseTimer > 0f && AttackFrames.Length > 0 ? AttackFrames :
+            IsMoving && MoveFrames.Length > 0 ? MoveFrames :
+            IdleFrames;
+
+        bool loop = ReferenceEquals(row, IdleFrames) || ReferenceEquals(row, MoveFrames);
+        if (!ReferenceEquals(row, _animRow))
+        {
+            _animRow = row;
+            _animIndex = 0;
+            _animTimer = 0f;
+        }
+
+        float step = ReferenceEquals(row, IdleFrames) ? 0.15f
+            : ReferenceEquals(row, MoveFrames) ? 0.13f
+            : ReferenceEquals(row, DefeatFrames) ? 0.22f
+            : 1f;
+
+        _animTimer += dt;
+        if (_animTimer >= step)
+        {
+            _animTimer = 0f;
+            int next = _animIndex + 1;
+            if (next >= row.Length)
+                next = loop ? 0 : row.Length - 1;
+            _animIndex = next;
+        }
+
+        var tex = row[_animIndex];
+        if (Sprite.Texture != tex)
+        {
+            Sprite.Texture = tex;
+            SpriteBaseOffset = new Vector2(0f, -tex.GetHeight() / 2f);
+            if (!IsAlive)
+                Sprite.Position = SpriteBaseOffset;
         }
     }
 }

@@ -166,7 +166,7 @@ public partial class ArmoryPanel : Control
 
             bool selected = op.Id == _selectedOp;
             var btn = MakeButton(op.DisplayName.ToUpperInvariant(),
-                selected ? op.Accent : new Color("#6b7a8d"), 76f);
+                selected ? op.Accent : new Color("#6b7a8d"), 44f);
             string id = op.Id;
             btn.Pressed += () =>
             {
@@ -174,6 +174,26 @@ public partial class ArmoryPanel : Control
                 RefreshAll();
             };
             _opRow.AddChild(btn);
+        }
+
+        _opRow.AddChild(new Control
+        {
+            SizeFlagsHorizontal = SizeFlags.ExpandFill,
+            MouseFilter = MouseFilterEnum.Ignore,
+        });
+
+        for (int i = 0; i < 4; i++)
+        {
+            var icon = Util.Assets.Load($"operators/{_selectedOp}/ability_{i}");
+            if (icon == null)
+                continue;
+            _opRow.AddChild(new TextureRect
+            {
+                Texture = icon,
+                TextureFilter = CanvasItem.TextureFilterEnum.Nearest,
+                SizeFlagsVertical = SizeFlags.ShrinkCenter,
+                MouseFilter = MouseFilterEnum.Ignore,
+            });
         }
     }
 
@@ -188,7 +208,7 @@ public partial class ArmoryPanel : Control
             string? itemId = gs.Equipped(_selectedOp, slot);
             var item = itemId != null ? Balance.Instance.Equipment.GetValueOrDefault(itemId) : null;
 
-            var card = new PanelContainer { CustomMinimumSize = new Vector2(137f, 34f) };
+            var card = new PanelContainer { CustomMinimumSize = new Vector2(137f, 56f) };
             var sb = new StyleBoxFlat
             {
                 BgColor = new Color(0.07f, 0.09f, 0.12f, 0.9f),
@@ -200,7 +220,23 @@ public partial class ArmoryPanel : Control
 
             var col = new VBoxContainer { MouseFilter = MouseFilterEnum.Ignore };
             col.AddThemeConstantOverride("separation", 1);
+            col.SizeFlagsHorizontal = SizeFlags.ExpandFill;
             card.AddChild(col);
+
+            if (item != null)
+            {
+                var icon = Util.Assets.Load($"{item.Slot}s/{item.Id}");
+                if (icon != null)
+                {
+                    col.AddChild(new TextureRect
+                    {
+                        Texture = icon,
+                        TextureFilter = CanvasItem.TextureFilterEnum.Nearest,
+                        SizeFlagsHorizontal = SizeFlags.ShrinkCenter,
+                        MouseFilter = MouseFilterEnum.Ignore,
+                    });
+                }
+            }
 
             var slotLabel = new Label { Text = label, MouseFilter = MouseFilterEnum.Ignore };
             slotLabel.AddThemeFontSizeOverride("font_size", 6);

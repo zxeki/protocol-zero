@@ -20,6 +20,7 @@ public partial class EnemyUnit : Combatant
     float _markTimer;
     UI.MarkIndicator? _markIndicator;
     OperatorUnit? _targetRef;
+    bool _moving;
 
     public bool IsStunned => _stunTimer > 0f;
     public bool IsMarked => _markTimer > 0f;
@@ -42,22 +43,46 @@ public partial class EnemyUnit : Combatant
         _attackTimer = AttackInterval * (0.4f + GD.Randf() * 0.4f);
     }
 
+    protected override bool IsMoving => _moving && IsAlive;
+
     protected override void BuildVisuals()
     {
-        Sprite.Texture = Def.Id switch
+        int frames = Def.Id switch
         {
-            "enforcer" => PixelArt.BuildEnforcer(),
-            "hunter_drone" => PixelArt.BuildHunterDrone(),
-            "the_warden" => PixelArt.BuildWarden(),
-            _ => PixelArt.BuildWatcher(),
+            "enforcer" => 3,
+            "hunter_drone" => 3,
+            "watcher" => 2,
+            "the_warden" => 1,
+            _ => 0,
         };
-        VisualHeight = Def.Id switch
+
+        IdleFrames = frames > 0 ? Assets.Frames($"enemies/{Def.Id}", "idle", frames) : System.Array.Empty<Texture2D>();
+        if (IdleFrames.Length > 0)
         {
-            "enforcer" => 32f,
-            "hunter_drone" => 14f,
-            "the_warden" => 52f,
-            _ => 16f,
-        };
+            MoveFrames = Assets.Frames($"enemies/{Def.Id}", "move", frames);
+            AttackFrames = Assets.Frames($"enemies/{Def.Id}", "attack", frames);
+            HurtFrames = Assets.Frames($"enemies/{Def.Id}", "hurt", frames);
+            DefeatFrames = Assets.Frames($"enemies/{Def.Id}", "defeat", frames);
+            VisualHeight = IdleFrames[0].GetHeight();
+            Sprite.Texture = IdleFrames[0];
+        }
+        else
+        {
+            Sprite.Texture = Def.Id switch
+            {
+                "enforcer" => PixelArt.BuildEnforcer(),
+                "hunter_drone" => PixelArt.BuildHunterDrone(),
+                "the_warden" => PixelArt.BuildWarden(),
+                _ => PixelArt.BuildWatcher(),
+            };
+            VisualHeight = Def.Id switch
+            {
+                "enforcer" => 32f,
+                "hunter_drone" => 14f,
+                "the_warden" => 52f,
+                _ => 16f,
+            };
+        }
         SpriteBaseOffset = new Vector2(0f, -VisualHeight / 2f);
         Sprite.Position = SpriteBaseOffset;
         _boltTexture = PixelArt.BuildBolt(new Color("#ffd2c4"), new Color("#e0483a"));
@@ -123,15 +148,20 @@ public partial class EnemyUnit : Combatant
 
         var target = ResolveTarget();
         if (target == null)
+        {
+            _moving = false;
             return;
+        }
 
         float dx = GlobalPosition.X - target.GlobalPosition.X;
         if (dx > Def.AttackRange)
         {
+            _moving = true;
             GlobalPosition += Vector2.Left * Def.MoveSpeed * (1f - _slowPct) * dt;
         }
         else
         {
+            _moving = false;
             _attackTimer -= dt * (1f - _slowPct * 0.5f);
             if (_attackTimer <= 0f)
             {
@@ -162,6 +192,7 @@ public partial class EnemyUnit : Combatant
         if (_boltTexture == null)
             return;
 
+        AttackPoseTimer = 0.18f;
         var muzzle = GlobalPosition + new Vector2(-8f, -VisualHeight * 0.5f);
         float dmg = BaseAttack * (0.9f + GD.Randf() * 0.2f);
         var proj = Projectile.Create(muzzle, target, Balance.Instance.Config.ProjectileSpeed * 0.75f,
@@ -172,8 +203,12 @@ public partial class EnemyUnit : Combatant
     public override void Die()
     {
         base.Die();
-        SetProcess(false);
         Bar.Visible = false;
+
+        var burst = Assets.Load(Def.Id == "the_warden" ? "vfx/burst" : "vfx/hit_orange");
+        if (burst != null)
+            UI.BurstFx.Spawn(_manager, GlobalPosition + new Vector2(0f, -VisualHeight * 0.45f), burst);
+
         var tw = CreateTween();
         tw.TweenProperty(this, "modulate:a", 0f, 0.35f).SetEase(Tween.EaseType.Out);
         tw.TweenCallback(Callable.From(QueueFree));

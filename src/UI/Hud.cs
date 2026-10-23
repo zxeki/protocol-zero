@@ -302,13 +302,16 @@ public partial class Hud : Control
         int node = (wave - 1) % 5 + 1;
         bool boss = cfg.BossWaveInterval > 0 && wave % cfg.BossWaveInterval == 0;
         bool elite = !boss && cfg.EliteWaveInterval > 0 && wave % cfg.EliteWaveInterval == 0;
+        string arena = ArenaNames[World.Battlefield.ArenaIndex(wave)];
 
-        _sectorLabel.Text = boss ? $"SECTOR {sector}-{node}  WARDEN"
-            : elite ? $"SECTOR {sector}-{node}  ELITE"
-            : $"SECTOR {sector}-{node}";
+        _sectorLabel.Text = boss ? $"SECTOR {sector}-{node}  WARDEN · {arena}"
+            : elite ? $"SECTOR {sector}-{node}  ELITE · {arena}"
+            : $"SECTOR {sector}-{node}  · {arena}";
         _sectorLabel.AddThemeColorOverride("font_color",
             boss ? new Color("#e04848") : elite ? new Color("#f0a030") : new Color("#9fb2c8"));
     }
+
+    static readonly string[] ArenaNames = { "ROOFTOP", "FOUNDRY", "DOCKS" };
 
     void OnRewards(long credits, float xp)
     {

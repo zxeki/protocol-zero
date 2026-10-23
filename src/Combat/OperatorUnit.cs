@@ -85,14 +85,27 @@ public partial class OperatorUnit : Combatant
 
     protected override void BuildVisuals()
     {
-        (PortraitTexture, VisualHeight) = Def.Id switch
+        IdleFrames = Assets.Frames($"operators/{Def.Id}", "idle", 4);
+        if (IdleFrames.Length > 0)
         {
-            "volt" => (PixelArt.BuildVolt(), 28f),
-            "hawk" => (PixelArt.BuildHawk(), 28f),
-            "vex" => (PixelArt.BuildVex(), 28f),
-            "torque" => (PixelArt.BuildTorque(), 30f),
-            _ => (PixelArt.BuildStriker(), 28f),
-        };
+            MoveFrames = Assets.Frames($"operators/{Def.Id}", "move", 4);
+            AttackFrames = Assets.Frames($"operators/{Def.Id}", "attack", 4);
+            HurtFrames = Assets.Frames($"operators/{Def.Id}", "hurt", 4);
+            DefeatFrames = Assets.Frames($"operators/{Def.Id}", "defeat", 4);
+            VisualHeight = IdleFrames[0].GetHeight();
+            PortraitTexture = IdleFrames[0];
+        }
+        else
+        {
+            (PortraitTexture, VisualHeight) = Def.Id switch
+            {
+                "volt" => (PixelArt.BuildVolt(), 28f),
+                "hawk" => (PixelArt.BuildHawk(), 28f),
+                "vex" => (PixelArt.BuildVex(), 28f),
+                "torque" => (PixelArt.BuildTorque(), 30f),
+                _ => (PixelArt.BuildStriker(), 28f),
+            };
+        }
         Sprite.Texture = PortraitTexture;
         SpriteBaseOffset = new Vector2(0f, -VisualHeight / 2f);
         Sprite.Position = SpriteBaseOffset;
@@ -218,6 +231,7 @@ public partial class OperatorUnit : Combatant
             return;
 
         _recoilTimer = 0.09f;
+        AttackPoseTimer = 0.18f;
         var muzzle = GlobalPosition + new Vector2(16f, -16f);
         var proj = Projectile.Create(muzzle, target, Balance.Instance.Config.ProjectileSpeed,
             Colors.White, _boltTexture, () => OnHit(target));
