@@ -12,6 +12,7 @@ public partial class Balance : Node
     public BalanceConfig Config { get; private set; } = new();
     public List<OperatorDef> Operators { get; } = new();
     public Dictionary<string, EnemyDef> Enemies { get; } = new();
+    public Dictionary<string, EquipmentDef> Equipment { get; } = new();
 
     public override void _Ready()
     {
@@ -22,8 +23,10 @@ public partial class Balance : Node
             Operators.Add(op);
         foreach (var enemy in Load<List<EnemyDef>>("res://data/enemies.json") ?? [])
             Enemies[enemy.Id] = enemy;
+        foreach (var item in Load<List<EquipmentDef>>("res://data/equipment.json") ?? [])
+            Equipment[item.Id] = item;
 
-        GD.Print($"[Balance] {Operators.Count} operators, {Enemies.Count} enemy types loaded");
+        GD.Print($"[Balance] {Operators.Count} operators, {Enemies.Count} enemy types, {Equipment.Count} equipment loaded");
     }
 
     public OperatorDef GetOperator(string id) =>

@@ -1,16 +1,29 @@
 using Godot;
 using ProtocolZero.Combat;
 using ProtocolZero.Core;
+using ProtocolZero.Data;
 
 namespace ProtocolZero.UI;
 
 public partial class Hud : Control
 {
     CombatManager _combat = null!;
+    RecruitPanel _recruitPanel = null!;
+    ArmoryPanel _armoryPanel = null!;
+    SettingsPanel _settingsPanel = null!;
     Label _creditsLabel = null!;
     Label _sectorLabel = null!;
+    HBoxContainer _cardRow = null!;
+    Button _winMinBtn = null!;
+    Button _winCloseBtn = null!;
+    Button _resumeBtn = null!;
     readonly List<OperatorCard> _cards = new();
     float _refreshTimer;
+    bool _dragging;
+    Vector2I _dragOffset;
+
+    public event Action? MinimizeRequested;
+    public event Action? CloseRequested;
 
     sealed class OperatorCard
     {
@@ -23,15 +36,19 @@ public partial class Hud : Control
         public Button UltBtn = null!;
     }
 
-    public void Init(CombatManager combat)
+    public void Init(CombatManager combat, RecruitPanel recruitPanel, ArmoryPanel armoryPanel, SettingsPanel settingsPanel)
     {
         _combat = combat;
+        _recruitPanel = recruitPanel;
+        _armoryPanel = armoryPanel;
+        _settingsPanel = settingsPanel;
         Build();
 
         GameState.Instance.CreditsChanged += OnCreditsChanged;
         GameState.Instance.XpChanged += OnXpChanged;
         _combat.WaveChanged += OnWaveChanged;
         _combat.RewardsAwarded += OnRewards;
+        _combat.ItemDropped += OnItemDropped;
 
         OnCreditsChanged(GameState.Instance.Credits);
         OnWaveChanged(_combat.Wave);
@@ -41,6 +58,16 @@ public partial class Hud : Control
     {
         SetAnchorsPreset(LayoutPreset.FullRect);
         MouseFilter = MouseFilterEnum.Ignore;
+        ProcessMode = ProcessModeEnum.Always;
+
+        var dragStrip = new Control
+        {
+            Position = new Vector2(0f, 0f),
+            Size = new Vector2(480f, 18f),
+            MouseFilter = MouseFilterEnum.Stop,
+        };
+        dragStrip.GuiInput += OnDragStripInput;
+        AddChild(dragStrip);
 
         _creditsLabel = new Label { Position = new Vector2(8f, 5f), MouseFilter = MouseFilterEnum.Ignore };
         _creditsLabel.AddThemeFontSizeOverride("font_size", 9);
@@ -49,10 +76,25 @@ public partial class Hud : Control
         _creditsLabel.AddThemeConstantOverride("outline_size", 2);
         AddChild(_creditsLabel);
 
+        var squadBtn = MakeButton("SQUAD", new Color("#3ecfb2"));
+        squadBtn.Position = new Vector2(100f, 3f);
+        squadBtn.Pressed += _recruitPanel.Open;
+        AddChild(squadBtn);
+
+        var armoryBtn = MakeButton("ARMORY", new Color("#f0a030"));
+        armoryBtn.Position = new Vector2(164f, 3f);
+        armoryBtn.Pressed += _armoryPanel.Open;
+        AddChild(armoryBtn);
+
+        var settingsBtn = MakeButton("SETTINGS", new Color("#4a9eff"));
+        settingsBtn.Position = new Vector2(228f, 3f);
+        settingsBtn.Pressed += _settingsPanel.Open;
+        AddChild(settingsBtn);
+
         _sectorLabel = new Label
         {
-            Position = new Vector2(280f, 5f),
-            Size = new Vector2(192f, 12f),
+            Position = new Vector2(290f, 5f),
+            Size = new Vector2(148f, 12f),
             HorizontalAlignment = HorizontalAlignment.Right,
             MouseFilter = MouseFilterEnum.Ignore,
         };
@@ -62,13 +104,45 @@ public partial class Hud : Control
         _sectorLabel.AddThemeConstantOverride("outline_size", 2);
         AddChild(_sectorLabel);
 
-        float x = 6f;
+        _winMinBtn = MakeButton("v", new Color("#9fb2c8"));
+        _winMinBtn.Position = new Vector2(442f, 3f);
+        _winMinBtn.CustomMinimumSize = new Vector2(14f, 14f);
+        _winMinBtn.Pressed += () => MinimizeRequested?.Invoke();
+        AddChild(_winMinBtn);
+
+        _winCloseBtn = MakeButton("x", new Color("#e04848"));
+        _winCloseBtn.Position = new Vector2(458f, 3f);
+        _winCloseBtn.CustomMinimumSize = new Vector2(14f, 14f);
+        _winCloseBtn.Pressed += () => CloseRequested?.Invoke();
+        AddChild(_winCloseBtn);
+
+        _resumeBtn = MakeButton("RESUME", new Color("#3ecfb2"));
+        _resumeBtn.Position = new Vector2(406f, 20f);
+        _resumeBtn.Visible = false;
+        _resumeBtn.Pressed += OnResumePressed;
+        AddChild(_resumeBtn);
+
+        _cardRow = new HBoxContainer
+        {
+            Position = new Vector2(6f, 270f - 66f),
+        };
+        _cardRow.AddThemeConstantOverride("separation", 6);
+        _cardRow.MouseFilter = MouseFilterEnum.Ignore;
+        AddChild(_cardRow);
+
+        RebuildCards();
+    }
+
+    public void RebuildCards()
+    {
+        foreach (var child in _cardRow.GetChildren())
+            child.QueueFree();
+        _cards.Clear();
+
         foreach (var op in _combat.Operators)
         {
             var panel = BuildCard(op);
-            panel.Position = new Vector2(x, 270f - 66f);
-            AddChild(panel);
-            x += 164f;
+            _cardRow.AddChild(panel);
         }
     }
 
@@ -76,7 +150,7 @@ public partial class Hud : Control
     {
         var c = new OperatorCard { Unit = op };
 
-        var panel = new PanelContainer { CustomMinimumSize = new Vector2(158f, 60f) };
+        var panel = new PanelContainer { CustomMinimumSize = new Vector2(150f, 60f) };
         var sb = new StyleBoxFlat
         {
             BgColor = new Color(0.06f, 0.08f, 0.11f, 0.85f),
@@ -102,10 +176,10 @@ public partial class Hud : Control
         c.NameLabel.AddThemeColorOverride("font_color", op.Def.Accent);
         vbox.AddChild(c.NameLabel);
 
-        c.HpBar = MakeBar(new Color("#e04848"), new Color("#2a1518"), 88f);
+        c.HpBar = MakeBar(new Color("#e04848"), new Color("#2a1518"), 78f);
         vbox.AddChild(c.HpBar);
 
-        c.XpBar = MakeBar(new Color("#4a9eff"), new Color("#141c2a"), 88f);
+        c.XpBar = MakeBar(new Color("#4a9eff"), new Color("#141c2a"), 78f);
         vbox.AddChild(c.XpBar);
 
         c.StatsLabel = new Label { MouseFilter = MouseFilterEnum.Ignore };
@@ -119,7 +193,7 @@ public partial class Hud : Control
         btnBox.MouseFilter = MouseFilterEnum.Ignore;
         hbox.AddChild(btnBox);
 
-        c.ActiveBtn = MakeButton("BURST", op.Def.Accent);
+        c.ActiveBtn = MakeButton(op.Def.ActiveLabel, op.Def.Accent);
         c.ActiveBtn.Pressed += op.ActivateActive;
         btnBox.AddChild(c.ActiveBtn);
 
@@ -194,8 +268,44 @@ public partial class Hud : Control
         return b;
     }
 
+    void OnDragStripInput(InputEvent @event)
+    {
+        if (@event is InputEventMouseButton { ButtonIndex: MouseButton.Left, Pressed: true })
+        {
+            _dragging = true;
+            _dragOffset = DisplayServer.MouseGetPosition() - DisplayServer.WindowGetPosition();
+        }
+        else if (@event is InputEventMouseButton { ButtonIndex: MouseButton.Left, Pressed: false })
+            _dragging = false;
+    }
+
+    void OnResumePressed()
+    {
+        GameState.Instance.ManualPause = false;
+        GetTree().Paused = false;
+    }
+
+    public void RefreshWindowChrome()
+    {
+        bool borderless = GameState.Instance.Settings.Borderless;
+        _winMinBtn.Visible = borderless;
+        _winCloseBtn.Visible = borderless;
+
+        bool panelOpen = _recruitPanel.Visible || _armoryPanel.Visible || _settingsPanel.Visible;
+        _resumeBtn.Visible = GetTree().Paused && !panelOpen;
+    }
+
+    public override void _Notification(int what)
+    {
+        if (what == NotificationWMMouseExit)
+            _dragging = false;
+    }
+
     public override void _Process(double delta)
     {
+        if (_dragging)
+            DisplayServer.WindowSetPosition(DisplayServer.MouseGetPosition() - _dragOffset);
+
         _refreshTimer -= (float)delta;
         if (_refreshTimer > 0f)
             return;
@@ -203,6 +313,8 @@ public partial class Hud : Control
 
         foreach (var c in _cards)
             RefreshCard(c);
+
+        RefreshWindowChrome();
     }
 
     void RefreshCard(OperatorCard c)
@@ -228,25 +340,25 @@ public partial class Hud : Control
             return;
         }
 
-        if (u.BurstCooldownRemaining > 0f)
+        if (u.ActiveCooldownRemaining > 0f)
         {
-            c.ActiveBtn.Text = $"BURST {u.BurstCooldownRemaining:0.0}";
+            c.ActiveBtn.Text = $"{u.ActiveCooldownRemaining:0.0}s";
             c.ActiveBtn.Disabled = true;
         }
         else
         {
-            c.ActiveBtn.Text = "BURST";
+            c.ActiveBtn.Text = u.Def.ActiveLabel;
             c.ActiveBtn.Disabled = false;
         }
 
-        if (u.OverdriveRemaining > 0f)
+        if (u.UltStateRemaining > 0f)
         {
-            c.UltBtn.Text = $"OVER x{u.OverdriveRemaining:0.0}";
+            c.UltBtn.Text = $"{u.UltStateRemaining:0.0}s";
             c.UltBtn.Disabled = true;
         }
         else if (u.UltReady)
         {
-            c.UltBtn.Text = "OVERDRIVE!";
+            c.UltBtn.Text = u.Def.UltLabel;
             c.UltBtn.Disabled = false;
         }
         else
@@ -266,30 +378,68 @@ public partial class Hud : Control
 
     void OnWaveChanged(int wave)
     {
+        var cfg = Balance.Instance.Config;
         int sector = (wave - 1) / 5 + 1;
         int node = (wave - 1) % 5 + 1;
-        _sectorLabel.Text = $"SECTOR {sector}-{node}";
+        bool boss = cfg.BossWaveInterval > 0 && wave % cfg.BossWaveInterval == 0;
+        bool elite = !boss && cfg.EliteWaveInterval > 0 && wave % cfg.EliteWaveInterval == 0;
+        string arena = ArenaNames[World.Battlefield.ArenaIndex(wave)];
+
+        _sectorLabel.Text = boss ? $"SECTOR {sector}-{node}  WARDEN · {arena}"
+            : elite ? $"SECTOR {sector}-{node}  ELITE · {arena}"
+            : $"SECTOR {sector}-{node}  · {arena}";
+        _sectorLabel.AddThemeColorOverride("font_color",
+            boss ? new Color("#e04848") : elite ? new Color("#f0a030") : new Color("#9fb2c8"));
     }
+
+    static readonly string[] ArenaNames = { "ROOFTOP", "FOUNDRY", "DOCKS" };
 
     void OnRewards(long credits, float xp)
     {
+        SpawnToast($"+{credits:N0} CR   +{Mathf.CeilToInt(xp)} XP", new Color("#ffd75e"), 24f);
+    }
+
+    void OnItemDropped(EquipmentDef item)
+    {
+        var rarity = item.Rarity switch
+        {
+            "legendary" => new Color("#ffd75e"),
+            "epic" => new Color("#c06ae0"),
+            "rare" => new Color("#4a9eff"),
+            _ => new Color("#9fb2c8"),
+        };
+        SpawnToast($"LOOT  [{item.Rarity.ToUpperInvariant()}] {item.DisplayName}", rarity, 38f);
+    }
+
+    public void ShowOfflineSummary(OfflineSummary summary)
+    {
+        int totalMinutes = Mathf.Max(1, (int)(summary.Hours * 60f));
+        string duration = totalMinutes >= 60
+            ? $"{totalMinutes / 60}h {totalMinutes % 60:D2}m"
+            : $"{totalMinutes}m";
+        SpawnToast($"OFFLINE {duration}  +{summary.Credits:N0} CR  +{Mathf.CeilToInt(summary.Xp)} XP",
+            new Color("#3ecfb2"), 56f);
+    }
+
+    void SpawnToast(string text, Color color, float y)
+    {
         var label = new Label
         {
-            Text = $"+{credits:N0} CR   +{Mathf.CeilToInt(xp)} XP",
+            Text = text,
             HorizontalAlignment = HorizontalAlignment.Center,
-            Position = new Vector2(140f, 24f),
+            Position = new Vector2(140f, y),
             Size = new Vector2(200f, 14f),
             MouseFilter = MouseFilterEnum.Ignore,
         };
         label.AddThemeFontSizeOverride("font_size", 9);
-        label.AddThemeColorOverride("font_color", new Color("#ffd75e"));
+        label.AddThemeColorOverride("font_color", color);
         label.AddThemeColorOverride("font_outline_color", new Color(0f, 0f, 0f, 0.9f));
         label.AddThemeConstantOverride("outline_size", 3);
         AddChild(label);
 
         var tw = label.CreateTween();
-        tw.TweenProperty(label, "position:y", 12f, 0.8f).SetEase(Tween.EaseType.Out);
-        tw.Parallel().TweenProperty(label, "modulate:a", 0f, 0.35f).SetDelay(0.45f);
+        tw.TweenProperty(label, "position:y", y - 12f, 0.8f).SetEase(Tween.EaseType.Out);
+        tw.Parallel().TweenProperty(label, "modulate:a", 0f, 0.35f).SetDelay(0.7f);
         tw.TweenCallback(Callable.From(label.QueueFree));
     }
 }
