@@ -23,10 +23,15 @@ public partial class GameState : Node
     public List<string> Owned { get; } = new();
     public List<string> Squad { get; } = new();
 
+    public Dictionary<string, int> Inventory { get; } = new();
+    public Dictionary<string, Dictionary<string, string>> Loadout { get; } = new();
+    public Dictionary<string, SavedUpgrades> Upgrades { get; } = new();
+
     public event Action<long>? CreditsChanged;
     public event Action<string, OperatorProgress>? XpChanged;
     public event Action<string>? OwnedChanged;
     public event Action? SquadChanged;
+    public event Action? EquipmentChanged;
 
     public override void _Ready()
     {
@@ -103,6 +108,110 @@ public partial class GameState : Node
         Save();
         GD.Print($"[GameState] Boss milestone #{bossIndex} claimed: +{bonus} CR");
         return bonus;
+    }
+
+    public void AddEquipment(string itemId, int count = 1)
+    {
+        if (!Balance.Instance.Equipment.ContainsKey(itemId) || count <= 0)
+            return;
+        Inventory[itemId] = Inventory.GetValueOrDefault(itemId) + count;
+        EquipmentChanged?.Invoke();
+        Save();
+    }
+
+    public int InventoryCount(string itemId) => Inventory.GetValueOrDefault(itemId);
+
+    public Dictionary<string, string> LoadoutFor(string operatorId) =>
+        Loadout.TryGetValue(operatorId, out var slots) ? slots : new Dictionary<string, string>();
+
+    public string? Equipped(string operatorId, string slot) =>
+        LoadoutFor(operatorId).GetValueOrDefault(slot);
+
+    public bool Equip(string operatorId, string itemId)
+    {
+        if (!Balance.Instance.Equipment.TryGetValue(itemId, out var item))
+            return false;
+        if (Inventory.GetValueOrDefault(itemId) <= 0)
+            return false;
+        if (!Owned.Contains(operatorId))
+            return false;
+
+        var slots = LoadoutFor(operatorId);
+        string? previous = slots.GetValueOrDefault(item.Slot);
+
+        Inventory[itemId]--;
+        if (Inventory[itemId] <= 0)
+            Inventory.Remove(itemId);
+
+        slots[item.Slot] = itemId;
+        Loadout[operatorId] = slots;
+        if (previous != null)
+            Inventory[previous] = Inventory.GetValueOrDefault(previous) + 1;
+
+        EquipmentChanged?.Invoke();
+        Save();
+        return true;
+    }
+
+    public bool Unequip(string operatorId, string slot)
+    {
+        if (!Loadout.TryGetValue(operatorId, out var slots))
+            return false;
+        if (!slots.TryGetValue(slot, out var itemId))
+            return false;
+
+        slots.Remove(slot);
+        if (slots.Count == 0)
+            Loadout.Remove(operatorId);
+        Inventory[itemId] = Inventory.GetValueOrDefault(itemId) + 1;
+
+        EquipmentChanged?.Invoke();
+        Save();
+        return true;
+    }
+
+    public (float attack, float hp) EquipBonus(string operatorId)
+    {
+        float atk = 0f, hp = 0f;
+        foreach (var itemId in LoadoutFor(operatorId).Values)
+        {
+            if (!Balance.Instance.Equipment.TryGetValue(itemId, out var item))
+                continue;
+            atk += item.Attack;
+            hp += item.Hp;
+        }
+        return (atk, hp);
+    }
+
+    public SavedUpgrades UpgradesFor(string operatorId)
+    {
+        if (!Upgrades.TryGetValue(operatorId, out var up))
+            Upgrades[operatorId] = up = new SavedUpgrades();
+        return up;
+    }
+
+    public long UpgradeCost(int rank) =>
+        (long)MathF.Round(Balance.Instance.Config.UpgradeBaseCost
+            * MathF.Pow(Balance.Instance.Config.UpgradeCostGrowth, rank));
+
+    public bool TryUpgrade(string operatorId, bool tech)
+    {
+        var cfg = Balance.Instance.Config;
+        var up = UpgradesFor(operatorId);
+        int rank = tech ? up.TechRank : up.PowerRank;
+        if (rank >= cfg.UpgradeMaxRank)
+            return false;
+        if (!TrySpend(UpgradeCost(rank)))
+            return false;
+
+        if (tech)
+            up.TechRank++;
+        else
+            up.PowerRank++;
+
+        EquipmentChanged?.Invoke();
+        Save();
+        return true;
     }
 
     public bool TryRecruit(string operatorId)
@@ -203,6 +312,13 @@ public partial class GameState : Node
             Operators = Progress.ToDictionary(
                 kv => kv.Key,
                 kv => new SavedOperator { Level = kv.Value.Level, Xp = kv.Value.Xp }),
+            Inventory = new Dictionary<string, int>(Inventory),
+            Loadout = Loadout.ToDictionary(
+                kv => kv.Key,
+                kv => new Dictionary<string, string>(kv.Value)),
+            Upgrades = Upgrades.ToDictionary(
+                kv => kv.Key,
+                kv => new SavedUpgrades { PowerRank = kv.Value.PowerRank, TechRank = kv.Value.TechRank }),
         };
 
         try
@@ -283,7 +399,52 @@ public partial class GameState : Node
         if (Squad.Count == 0 && Owned.Count > 0)
             Squad.Add(Owned[0]);
 
-        GD.Print($"[GameState] Loaded save: {Owned.Count} owned, squad [{string.Join(", ", Squad)}], {Credits} CR");
+        var validItems = Balance.Instance.Equipment;
+        Inventory.Clear();
+        foreach (var (itemId, count) in data.Inventory)
+        {
+            if (validItems.ContainsKey(itemId) && count > 0)
+                Inventory[itemId] = count;
+        }
+
+        Loadout.Clear();
+        foreach (var (opId, slots) in data.Loadout)
+        {
+            if (!Owned.Contains(opId))
+            {
+                foreach (var itemId in slots.Values)
+                {
+                    if (validItems.ContainsKey(itemId))
+                        Inventory[itemId] = Inventory.GetValueOrDefault(itemId) + 1;
+                }
+                continue;
+            }
+            var kept = new Dictionary<string, string>();
+            foreach (var (slot, itemId) in slots)
+            {
+                if (validItems.TryGetValue(itemId, out var item) && item.Slot == slot && !kept.ContainsKey(slot))
+                    kept[slot] = itemId;
+                else
+                    Inventory[itemId] = Inventory.GetValueOrDefault(itemId) + 1;
+            }
+            if (kept.Count > 0)
+                Loadout[opId] = kept;
+        }
+
+        Upgrades.Clear();
+        foreach (var (opId, up) in data.Upgrades)
+        {
+            if (!Owned.Contains(opId))
+                continue;
+            Upgrades[opId] = new SavedUpgrades
+            {
+                PowerRank = Mathf.Clamp(up.PowerRank, 0, cfg.UpgradeMaxRank),
+                TechRank = Mathf.Clamp(up.TechRank, 0, cfg.UpgradeMaxRank),
+            };
+        }
+
+        GD.Print($"[GameState] Loaded save: {Owned.Count} owned, squad [{string.Join(", ", Squad)}], {Credits} CR"
+            + (Inventory.Count > 0 ? $", {Inventory.Values.Sum()} items" : ""));
         return true;
     }
 }

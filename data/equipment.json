@@ -1,0 +1,20 @@
+[
+  { "id": "rust_pistol",   "display_name": "Rust Pistol",   "slot": "weapon", "rarity": "common",    "attack": 4,  "hp": 0 },
+  { "id": "scrap_rifle",   "display_name": "Scrap Rifle",   "slot": "weapon", "rarity": "common",    "attack": 5,  "hp": 0 },
+  { "id": "arc_blade",     "display_name": "Arc Blade",     "slot": "weapon", "rarity": "rare",      "attack": 9,  "hp": 4 },
+  { "id": "pulse_carbine", "display_name": "Pulse Carbine", "slot": "weapon", "rarity": "rare",      "attack": 10, "hp": 0 },
+  { "id": "rail_driver",   "display_name": "Rail Driver",   "slot": "weapon", "rarity": "epic",      "attack": 16, "hp": 8 },
+  { "id": "nova_cannon",   "display_name": "Nova Cannon",   "slot": "weapon", "rarity": "legendary", "attack": 24, "hp": 12 },
+
+  { "id": "patch_vest",    "display_name": "Patch Vest",    "slot": "armor",  "rarity": "common",    "attack": 0,  "hp": 30 },
+  { "id": "kevlar_shell",  "display_name": "Kevlar Shell",  "slot": "armor",  "rarity": "common",    "attack": 0,  "hp": 40 },
+  { "id": "reactive_plate","display_name": "Reactive Plate","slot": "armor",  "rarity": "rare",      "attack": 2,  "hp": 80 },
+  { "id": "aegis_mail",    "display_name": "Aegis Mail",    "slot": "armor",  "rarity": "rare",      "attack": 0,  "hp": 95 },
+  { "id": "phase_carapace","display_name": "Phase Carapace","slot": "armor",  "rarity": "epic",      "attack": 5,  "hp": 160 },
+  { "id": "titan_core",    "display_name": "Titan Core",    "slot": "armor",  "rarity": "legendary", "attack": 8,  "hp": 250 },
+
+  { "id": "stim_pack",     "display_name": "Stim Pack",     "slot": "implant","rarity": "common",    "attack": 2,  "hp": 12 },
+  { "id": "reflex_chip",   "display_name": "Reflex Chip",   "slot": "implant","rarity": "rare",      "attack": 5,  "hp": 30 },
+  { "id": "adrenal_gear",  "display_name": "Adrenal Gear",  "slot": "implant","rarity": "epic",      "attack": 9,  "hp": 60 },
+  { "id": "overmind_ai",   "display_name": "Overmind AI",   "slot": "implant","rarity": "legendary", "attack": 14, "hp": 100 }
+]

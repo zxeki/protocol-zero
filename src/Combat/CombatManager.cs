@@ -1,5 +1,6 @@
 using Godot;
 using ProtocolZero.Core;
+using ProtocolZero.Data;
 using ProtocolZero.UI;
 using ProtocolZero.World;
 
@@ -14,6 +15,7 @@ public partial class CombatManager : Node2D
 
     public event Action<int>? WaveChanged;
     public event Action<long, float>? RewardsAwarded;
+    public event Action<EquipmentDef>? ItemDropped;
     public event Action<EnemyUnit>? EnemyKilled;
 
     Node _unitLayer = null!;
@@ -24,6 +26,21 @@ public partial class CombatManager : Node2D
     {
         _unitLayer = new Node2D { Name = "Units" };
         AddChild(_unitLayer);
+        GameState.Instance.EquipmentChanged += OnEquipmentChanged;
+    }
+
+    public override void _ExitTree()
+    {
+        GameState.Instance.EquipmentChanged -= OnEquipmentChanged;
+    }
+
+    void OnEquipmentChanged()
+    {
+        foreach (var op in Operators)
+        {
+            if (GodotObject.IsInstanceValid(op))
+                op.RefreshStats();
+        }
     }
 
     public void SpawnSquad()
@@ -144,16 +161,72 @@ public partial class CombatManager : Node2D
         if (e.Def.Id == "the_warden" && cfg.BossWaveInterval > 0)
             milestoneBonus = GameState.Instance.ClaimBossMilestone(Mathf.Max(1, Wave / cfg.BossWaveInterval));
 
+        EquipmentDef? drop = RollEquipmentDrop(e.Def.Id == "the_warden", cfg);
+        if (drop != null)
+        {
+            GameState.Instance.AddEquipment(drop.Id);
+            ItemDropped?.Invoke(drop);
+        }
+
         RewardsAwarded?.Invoke(credits + milestoneBonus, xp);
         EnemyKilled?.Invoke(e);
         GD.Print($"[Combat] Wave {Wave}: {e.Def.DisplayName} defeated  +{credits} CR  +{xp:0} XP"
-            + (milestoneBonus > 0 ? $"  +{milestoneBonus} CR milestone" : ""));
+            + (milestoneBonus > 0 ? $"  +{milestoneBonus} CR milestone" : "")
+            + (drop != null ? $"  +[{drop.Rarity}] {drop.DisplayName}" : ""));
 
         if (Enemies.Count == 0 && !_waveEnding)
         {
             _waveEnding = true;
             GetTree().CreateTimer(cfg.RespawnDelaySec).Timeout += SpawnNextWave;
         }
+    }
+
+    static EquipmentDef? RollEquipmentDrop(bool boss, BalanceConfig cfg)
+    {
+        float chance = boss ? cfg.DropChanceBoss : cfg.DropChance;
+        if (GD.Randf() >= chance)
+            return null;
+
+        var items = Balance.Instance.Equipment.Values.ToList();
+        if (items.Count == 0)
+            return null;
+
+        string[] rarities = { "common", "rare", "epic", "legendary" };
+        float[] weights = cfg.RarityWeights;
+        int best = 0;
+        int rolls = Mathf.Max(1, cfg.RarityRollsMax);
+        for (int i = 0; i < rolls; i++)
+        {
+            int r = PickRarity(weights);
+            if (r > best)
+                best = r;
+        }
+
+        var pool = items.Where(it => it.Rarity == rarities[best]).ToList();
+        while (pool.Count == 0 && best > 0)
+        {
+            best--;
+            pool = items.Where(it => it.Rarity == rarities[best]).ToList();
+        }
+        return pool.Count > 0 ? pool[(int)(GD.Randi() % (uint)pool.Count)] : null;
+    }
+
+    static int PickRarity(float[] weights)
+    {
+        float total = 0f;
+        foreach (var w in weights)
+            total += Mathf.Max(0f, w);
+        if (total <= 0f)
+            return 0;
+
+        float roll = GD.Randf() * total;
+        for (int i = 0; i < weights.Length; i++)
+        {
+            roll -= Mathf.Max(0f, weights[i]);
+            if (roll <= 0f)
+                return i;
+        }
+        return 0;
     }
 
     public void OnOperatorDowned(OperatorUnit op)

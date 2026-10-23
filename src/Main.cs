@@ -29,7 +29,10 @@ public partial class Main : Node2D
         var recruitPanel = new RecruitPanel();
         hudLayer.AddChild(recruitPanel);
 
-        _hud.Init(_combat, recruitPanel);
+        var armoryPanel = new ArmoryPanel();
+        hudLayer.AddChild(armoryPanel);
+
+        _hud.Init(_combat, recruitPanel, armoryPanel);
 
         GameState.Instance.SquadChanged += OnSquadChanged;
 

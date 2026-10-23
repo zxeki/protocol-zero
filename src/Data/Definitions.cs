@@ -121,6 +121,17 @@ public sealed class BalanceConfig
     public float FortressTakenMult { get; set; } = 0.6f;
     public float FortressShieldPct { get; set; } = 0.6f;
     public float FortressSec { get; set; } = 6.0f;
+
+    public float DropChance { get; set; } = 0.15f;
+    public float DropChanceBoss { get; set; } = 1.0f;
+    public int RarityRollsMax { get; set; } = 4;
+    public float[] RarityWeights { get; set; } = { 70.0f, 25.0f, 4.0f, 1.0f };
+
+    public long UpgradeBaseCost { get; set; } = 200;
+    public float UpgradeCostGrowth { get; set; } = 1.35f;
+    public int UpgradeMaxRank { get; set; } = 10;
+    public float UpgradeStatPerRankPct { get; set; } = 0.05f;
+    public float UpgradeTechCooldownPct { get; set; } = 0.04f;
 }
 
 public sealed class SaveData
@@ -131,10 +142,29 @@ public sealed class SaveData
     public List<string> Squad { get; set; } = new();
     public Dictionary<string, SavedOperator> Operators { get; set; } = new();
     public int BossesDefeated { get; set; }
+    public Dictionary<string, int> Inventory { get; set; } = new();
+    public Dictionary<string, Dictionary<string, string>> Loadout { get; set; } = new();
+    public Dictionary<string, SavedUpgrades> Upgrades { get; set; } = new();
 }
 
 public sealed class SavedOperator
 {
     public int Level { get; set; } = 1;
     public float Xp { get; set; }
+}
+
+public sealed class EquipmentDef
+{
+    public string Id { get; set; } = "";
+    public string DisplayName { get; set; } = "";
+    public string Slot { get; set; } = "weapon";
+    public string Rarity { get; set; } = "common";
+    public float Attack { get; set; }
+    public float Hp { get; set; }
+}
+
+public sealed class SavedUpgrades
+{
+    public int PowerRank { get; set; }
+    public int TechRank { get; set; }
 }

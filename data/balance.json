@@ -56,5 +56,14 @@
   "fortify_taken_mult": 0.8,
   "fortress_taken_mult": 0.6,
   "fortress_shield_pct": 0.6,
-  "fortress_sec": 6.0
+  "fortress_sec": 6.0,
+  "drop_chance": 0.15,
+  "drop_chance_boss": 1.0,
+  "rarity_rolls_max": 4,
+  "rarity_weights": [70.0, 25.0, 4.0, 1.0],
+  "upgrade_base_cost": 200,
+  "upgrade_cost_growth": 1.35,
+  "upgrade_max_rank": 10,
+  "upgrade_stat_per_rank_pct": 0.05,
+  "upgrade_tech_cooldown_pct": 0.04
 }
