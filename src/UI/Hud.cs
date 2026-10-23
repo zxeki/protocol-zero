@@ -10,11 +10,20 @@ public partial class Hud : Control
     CombatManager _combat = null!;
     RecruitPanel _recruitPanel = null!;
     ArmoryPanel _armoryPanel = null!;
+    SettingsPanel _settingsPanel = null!;
     Label _creditsLabel = null!;
     Label _sectorLabel = null!;
     HBoxContainer _cardRow = null!;
+    Button _winMinBtn = null!;
+    Button _winCloseBtn = null!;
+    Button _resumeBtn = null!;
     readonly List<OperatorCard> _cards = new();
     float _refreshTimer;
+    bool _dragging;
+    Vector2I _dragOffset;
+
+    public event Action? MinimizeRequested;
+    public event Action? CloseRequested;
 
     sealed class OperatorCard
     {
@@ -27,11 +36,12 @@ public partial class Hud : Control
         public Button UltBtn = null!;
     }
 
-    public void Init(CombatManager combat, RecruitPanel recruitPanel, ArmoryPanel armoryPanel)
+    public void Init(CombatManager combat, RecruitPanel recruitPanel, ArmoryPanel armoryPanel, SettingsPanel settingsPanel)
     {
         _combat = combat;
         _recruitPanel = recruitPanel;
         _armoryPanel = armoryPanel;
+        _settingsPanel = settingsPanel;
         Build();
 
         GameState.Instance.CreditsChanged += OnCreditsChanged;
@@ -48,6 +58,16 @@ public partial class Hud : Control
     {
         SetAnchorsPreset(LayoutPreset.FullRect);
         MouseFilter = MouseFilterEnum.Ignore;
+        ProcessMode = ProcessModeEnum.Always;
+
+        var dragStrip = new Control
+        {
+            Position = new Vector2(0f, 0f),
+            Size = new Vector2(480f, 18f),
+            MouseFilter = MouseFilterEnum.Stop,
+        };
+        dragStrip.GuiInput += OnDragStripInput;
+        AddChild(dragStrip);
 
         _creditsLabel = new Label { Position = new Vector2(8f, 5f), MouseFilter = MouseFilterEnum.Ignore };
         _creditsLabel.AddThemeFontSizeOverride("font_size", 9);
@@ -66,10 +86,15 @@ public partial class Hud : Control
         armoryBtn.Pressed += _armoryPanel.Open;
         AddChild(armoryBtn);
 
+        var settingsBtn = MakeButton("SETTINGS", new Color("#4a9eff"));
+        settingsBtn.Position = new Vector2(228f, 3f);
+        settingsBtn.Pressed += _settingsPanel.Open;
+        AddChild(settingsBtn);
+
         _sectorLabel = new Label
         {
-            Position = new Vector2(280f, 5f),
-            Size = new Vector2(192f, 12f),
+            Position = new Vector2(290f, 5f),
+            Size = new Vector2(148f, 12f),
             HorizontalAlignment = HorizontalAlignment.Right,
             MouseFilter = MouseFilterEnum.Ignore,
         };
@@ -78,6 +103,24 @@ public partial class Hud : Control
         _sectorLabel.AddThemeColorOverride("font_outline_color", new Color(0f, 0f, 0f, 0.8f));
         _sectorLabel.AddThemeConstantOverride("outline_size", 2);
         AddChild(_sectorLabel);
+
+        _winMinBtn = MakeButton("v", new Color("#9fb2c8"));
+        _winMinBtn.Position = new Vector2(442f, 3f);
+        _winMinBtn.CustomMinimumSize = new Vector2(14f, 14f);
+        _winMinBtn.Pressed += () => MinimizeRequested?.Invoke();
+        AddChild(_winMinBtn);
+
+        _winCloseBtn = MakeButton("x", new Color("#e04848"));
+        _winCloseBtn.Position = new Vector2(458f, 3f);
+        _winCloseBtn.CustomMinimumSize = new Vector2(14f, 14f);
+        _winCloseBtn.Pressed += () => CloseRequested?.Invoke();
+        AddChild(_winCloseBtn);
+
+        _resumeBtn = MakeButton("RESUME", new Color("#3ecfb2"));
+        _resumeBtn.Position = new Vector2(406f, 20f);
+        _resumeBtn.Visible = false;
+        _resumeBtn.Pressed += OnResumePressed;
+        AddChild(_resumeBtn);
 
         _cardRow = new HBoxContainer
         {
@@ -225,8 +268,44 @@ public partial class Hud : Control
         return b;
     }
 
+    void OnDragStripInput(InputEvent @event)
+    {
+        if (@event is InputEventMouseButton { ButtonIndex: MouseButton.Left, Pressed: true })
+        {
+            _dragging = true;
+            _dragOffset = DisplayServer.MouseGetPosition() - DisplayServer.WindowGetPosition();
+        }
+        else if (@event is InputEventMouseButton { ButtonIndex: MouseButton.Left, Pressed: false })
+            _dragging = false;
+    }
+
+    void OnResumePressed()
+    {
+        GameState.Instance.ManualPause = false;
+        GetTree().Paused = false;
+    }
+
+    public void RefreshWindowChrome()
+    {
+        bool borderless = GameState.Instance.Settings.Borderless;
+        _winMinBtn.Visible = borderless;
+        _winCloseBtn.Visible = borderless;
+
+        bool panelOpen = _recruitPanel.Visible || _armoryPanel.Visible || _settingsPanel.Visible;
+        _resumeBtn.Visible = GetTree().Paused && !panelOpen;
+    }
+
+    public override void _Notification(int what)
+    {
+        if (what == NotificationWMMouseExit)
+            _dragging = false;
+    }
+
     public override void _Process(double delta)
     {
+        if (_dragging)
+            DisplayServer.WindowSetPosition(DisplayServer.MouseGetPosition() - _dragOffset);
+
         _refreshTimer -= (float)delta;
         if (_refreshTimer > 0f)
             return;
@@ -234,6 +313,8 @@ public partial class Hud : Control
 
         foreach (var c in _cards)
             RefreshCard(c);
+
+        RefreshWindowChrome();
     }
 
     void RefreshCard(OperatorCard c)

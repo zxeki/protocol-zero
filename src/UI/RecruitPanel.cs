@@ -257,7 +257,7 @@ public partial class RecruitPanel : Control
     public void Close()
     {
         Visible = false;
-        GetTree().Paused = false;
+        GetTree().Paused = GameState.Instance.ManualPause;
         GameState.Instance.Save();
     }
 

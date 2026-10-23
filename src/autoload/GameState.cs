@@ -31,6 +31,8 @@ public partial class GameState : Node
     public UserSettings Settings { get; private set; } = new();
     public OfflineSummary? OfflineSummary { get; private set; }
 
+    public bool ManualPause { get; set; }
+
     public event Action<long>? CreditsChanged;
     public event Action<string, OperatorProgress>? XpChanged;
     public event Action<string>? OwnedChanged;
