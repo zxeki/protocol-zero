@@ -7,8 +7,10 @@ namespace ProtocolZero.UI;
 public partial class Hud : Control
 {
     CombatManager _combat = null!;
+    RecruitPanel _recruitPanel = null!;
     Label _creditsLabel = null!;
     Label _sectorLabel = null!;
+    HBoxContainer _cardRow = null!;
     readonly List<OperatorCard> _cards = new();
     float _refreshTimer;
 
@@ -23,9 +25,10 @@ public partial class Hud : Control
         public Button UltBtn = null!;
     }
 
-    public void Init(CombatManager combat)
+    public void Init(CombatManager combat, RecruitPanel recruitPanel)
     {
         _combat = combat;
+        _recruitPanel = recruitPanel;
         Build();
 
         GameState.Instance.CreditsChanged += OnCreditsChanged;
@@ -49,6 +52,11 @@ public partial class Hud : Control
         _creditsLabel.AddThemeConstantOverride("outline_size", 2);
         AddChild(_creditsLabel);
 
+        var squadBtn = MakeButton("SQUAD", new Color("#3ecfb2"));
+        squadBtn.Position = new Vector2(100f, 3f);
+        squadBtn.Pressed += _recruitPanel.Open;
+        AddChild(squadBtn);
+
         _sectorLabel = new Label
         {
             Position = new Vector2(280f, 5f),
@@ -62,13 +70,27 @@ public partial class Hud : Control
         _sectorLabel.AddThemeConstantOverride("outline_size", 2);
         AddChild(_sectorLabel);
 
-        float x = 6f;
+        _cardRow = new HBoxContainer
+        {
+            Position = new Vector2(6f, 270f - 66f),
+        };
+        _cardRow.AddThemeConstantOverride("separation", 6);
+        _cardRow.MouseFilter = MouseFilterEnum.Ignore;
+        AddChild(_cardRow);
+
+        RebuildCards();
+    }
+
+    public void RebuildCards()
+    {
+        foreach (var child in _cardRow.GetChildren())
+            child.QueueFree();
+        _cards.Clear();
+
         foreach (var op in _combat.Operators)
         {
             var panel = BuildCard(op);
-            panel.Position = new Vector2(x, 270f - 66f);
-            AddChild(panel);
-            x += 156f;
+            _cardRow.AddChild(panel);
         }
     }
 

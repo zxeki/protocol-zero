@@ -20,6 +20,7 @@
   "projectile_speed": 260.0,
   "squad_size": 3,
   "default_squad": ["torque", "striker", "vex"],
+  "starting_credits": 500,
   "enemies_per_wave_base": 1,
   "enemies_per_wave_growth_divisor": 3,
   "enemies_per_wave_max": 3,
