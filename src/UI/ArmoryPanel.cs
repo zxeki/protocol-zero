@@ -434,7 +434,7 @@ public partial class ArmoryPanel : Control
     public void Close()
     {
         Visible = false;
-        GetTree().Paused = false;
+        GetTree().Paused = GameState.Instance.ManualPause;
         GameState.Instance.Save();
     }
 

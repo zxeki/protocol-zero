@@ -158,6 +158,9 @@ public sealed class UserSettings
     public int Version { get; set; } = 1;
     public bool OfflineRewardsEnabled { get; set; } = true;
     public bool AlwaysOnTop { get; set; }
+    public bool Borderless { get; set; } = true;
+    public bool WindowExpanded { get; set; }
+    public bool MinimizeToTray { get; set; }
 }
 
 public sealed class OfflineSummary
