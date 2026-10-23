@@ -10,7 +10,10 @@
     "recruitment_cost": 0,
     "passive_id": "execution_protocol",
     "active_id": "rapid_burst",
-    "ultimate_id": "overdrive"
+    "ultimate_id": "overdrive",
+    "active_label": "BURST",
+    "ult_label": "OVERDRIVE",
+    "active_cooldown_sec": 8.0
   },
   {
     "id": "volt",
@@ -23,7 +26,10 @@
     "recruitment_cost": 2500,
     "passive_id": "arc_conduction",
     "active_id": "pulse_field",
-    "ultimate_id": "blackout"
+    "ultimate_id": "blackout",
+    "active_label": "PULSE FIELD",
+    "ult_label": "BLACKOUT",
+    "active_cooldown_sec": 9.0
   },
   {
     "id": "hawk",
@@ -36,7 +42,10 @@
     "recruitment_cost": 500,
     "passive_id": "target_analysis",
     "active_id": "scout_drone",
-    "ultimate_id": "target_lock"
+    "ultimate_id": "target_lock",
+    "active_label": "SCOUT DRONE",
+    "ult_label": "TARGET LOCK",
+    "active_cooldown_sec": 7.0
   },
   {
     "id": "vex",
@@ -49,7 +58,10 @@
     "recruitment_cost": 4000,
     "passive_id": "nanite_recovery",
     "active_id": "repair_wave",
-    "ultimate_id": "second_wind"
+    "ultimate_id": "second_wind",
+    "active_label": "REPAIR WAVE",
+    "ult_label": "SECOND WIND",
+    "active_cooldown_sec": 10.0
   },
   {
     "id": "torque",
@@ -62,6 +74,9 @@
     "recruitment_cost": 1200,
     "passive_id": "fortified_plating",
     "active_id": "deploy_barrier",
-    "ultimate_id": "fortress"
+    "ultimate_id": "fortress",
+    "active_label": "BARRIER",
+    "ult_label": "FORTRESS",
+    "active_cooldown_sec": 9.0
   }
 ]

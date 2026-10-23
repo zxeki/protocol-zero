@@ -14,6 +14,16 @@ public partial class EnemyUnit : Combatant
     CombatManager _manager = null!;
     float _attackTimer;
     Texture2D? _boltTexture;
+    float _slowTimer;
+    float _slowPct;
+    float _stunTimer;
+    float _markTimer;
+    UI.MarkIndicator? _markIndicator;
+    OperatorUnit? _targetRef;
+
+    public bool IsStunned => _stunTimer > 0f;
+    public bool IsMarked => _markTimer > 0f;
+    public float StunRemaining => _stunTimer;
 
     public void Init(EnemyDef def, CombatManager manager, int wave, bool isElite)
     {
@@ -45,6 +55,31 @@ public partial class EnemyUnit : Combatant
         _boltTexture = PixelArt.BuildBolt(new Color("#ffd2c4"), new Color("#e0483a"));
     }
 
+    public void ApplySlow(float pct, float sec)
+    {
+        _slowPct = Mathf.Max(_slowPct, pct);
+        _slowTimer = Mathf.Max(_slowTimer, sec);
+    }
+
+    public void Stun(float sec)
+    {
+        _stunTimer = Mathf.Max(_stunTimer, sec);
+    }
+
+    public void Mark(float sec)
+    {
+        _markTimer = Mathf.Max(_markTimer, sec);
+        if (_markIndicator == null || !GodotObject.IsInstanceValid(_markIndicator))
+            _markIndicator = UI.MarkIndicator.Attach(this);
+    }
+
+    public override void TakeDamage(float amount)
+    {
+        if (IsMarked)
+            amount *= Balance.Instance.Config.MarkBonusMult;
+        base.TakeDamage(amount);
+    }
+
     public override void _Process(double delta)
     {
         base._Process(delta);
@@ -52,18 +87,40 @@ public partial class EnemyUnit : Combatant
             return;
 
         float dt = (float)delta;
-        var target = _manager.GetTargetForEnemy(this);
+
+        if (_slowTimer > 0f)
+        {
+            _slowTimer -= dt;
+            if (_slowTimer <= 0f)
+                _slowPct = 0f;
+        }
+        if (_stunTimer > 0f)
+            _stunTimer -= dt;
+        if (_markTimer > 0f)
+        {
+            _markTimer -= dt;
+            if (_markTimer <= 0f && _markIndicator != null && GodotObject.IsInstanceValid(_markIndicator))
+                _markIndicator.QueueFree();
+        }
+
+        if (IsStunned)
+        {
+            Sprite.Modulate = new Color(0.55f, 0.65f, 0.95f);
+            return;
+        }
+
+        var target = ResolveTarget();
         if (target == null)
             return;
 
         float dx = GlobalPosition.X - target.GlobalPosition.X;
         if (dx > Def.AttackRange)
         {
-            GlobalPosition += Vector2.Left * Def.MoveSpeed * dt;
+            GlobalPosition += Vector2.Left * Def.MoveSpeed * (1f - _slowPct) * dt;
         }
         else
         {
-            _attackTimer -= dt;
+            _attackTimer -= dt * (1f - _slowPct * 0.5f);
             if (_attackTimer <= 0f)
             {
                 Fire(target);
@@ -73,6 +130,19 @@ public partial class EnemyUnit : Combatant
 
         int bob = (Time.GetTicksMsec() / 280) % 2 == 0 ? 0 : 1;
         Sprite.Position = SpriteBaseOffset + new Vector2(0, bob);
+    }
+
+    OperatorUnit? ResolveTarget()
+    {
+        var torque = _manager.GetTorque();
+        if (torque != null && torque.FortressTauntRemaining > 0f)
+            return torque;
+
+        if (_targetRef != null && GodotObject.IsInstanceValid(_targetRef) && _targetRef.IsAlive)
+            return _targetRef;
+
+        _targetRef = _manager.GetTargetForEnemy(this);
+        return _targetRef;
     }
 
     void Fire(OperatorUnit target)

@@ -28,6 +28,9 @@ public sealed class OperatorDef
     public string PassiveId { get; set; } = "";
     public string ActiveId { get; set; } = "";
     public string UltimateId { get; set; } = "";
+    public string ActiveLabel { get; set; } = "ACTIVE";
+    public string UltLabel { get; set; } = "ULT";
+    public float ActiveCooldownSec { get; set; } = 8.0f;
 
     [JsonIgnore]
     public Color Accent => new(AccentColor);
@@ -69,4 +72,45 @@ public sealed class BalanceConfig
     public float UltimateChargePerAttack { get; set; } = 0.05f;
     public int EliteWaveInterval { get; set; } = 5;
     public float ProjectileSpeed { get; set; } = 260.0f;
+
+    public int SquadSize { get; set; } = 3;
+    public List<string> DefaultSquad { get; set; } = new() { "torque", "striker", "vex" };
+
+    public int EnemiesPerWaveBase { get; set; } = 1;
+    public int EnemiesPerWaveGrowthDivisor { get; set; } = 3;
+    public int EnemiesPerWaveMax { get; set; } = 3;
+    public int EliteEscortCount { get; set; } = 2;
+
+    public int ChainEveryAttacks { get; set; } = 3;
+    public int ChainTargets { get; set; } = 2;
+    public float ChainDamageMult { get; set; } = 0.5f;
+
+    public float PulseDamageMult { get; set; } = 0.7f;
+    public float PulseSlowPct { get; set; } = 0.4f;
+    public float PulseSlowSec { get; set; } = 3.0f;
+
+    public float BlackoutStunSec { get; set; } = 6.0f;
+    public float BlackoutFallbackStunSec { get; set; } = 2.5f;
+
+    public float MarkBonusMult { get; set; } = 1.2f;
+    public float ScoutMarkSec { get; set; } = 10.0f;
+    public int LockShots { get; set; } = 5;
+    public float LockShotIntervalSec { get; set; } = 0.25f;
+    public float LockMarkSec { get; set; } = 6.0f;
+
+    public float RepairHealFlat { get; set; } = 12.0f;
+    public float RepairHealAttackMult { get; set; } = 1.6f;
+    public float SecondWindRevivePct { get; set; } = 0.5f;
+    public float SecondWindFallbackPct { get; set; } = 0.25f;
+
+    public float NaniteIntervalSec { get; set; } = 4.0f;
+    public float NaniteHealFlat { get; set; } = 8.0f;
+    public float NaniteHealAttackMult { get; set; } = 0.8f;
+
+    public float BarrierTakenMult { get; set; } = 0.6f;
+    public float BarrierSec { get; set; } = 4.0f;
+    public float FortifyTakenMult { get; set; } = 0.8f;
+    public float FortressTakenMult { get; set; } = 0.6f;
+    public float FortressShieldPct { get; set; } = 0.6f;
+    public float FortressSec { get; set; } = 6.0f;
 }

@@ -4,7 +4,7 @@ namespace ProtocolZero.World;
 
 public partial class Battlefield : Node2D
 {
-    public const float GroundY = 232f;
+    public const float GroundY = 206f;
 
     public override void _Draw()
     {
